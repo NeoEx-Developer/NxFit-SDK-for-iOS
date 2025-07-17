@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="23788" systemVersion="24E248" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
+    <entity name="_HealthSampleSyncAnchor" representedClassName="_HealthSampleSyncAnchor" syncable="YES">
+        <attribute name="anchor" attributeType="Binary" allowsExternalBinaryDataStorage="YES"/>
+        <attribute name="sampleType_" attributeType="String"/>
+        <attribute name="timestamp_" attributeType="Date" usesScalarValueType="NO"/>
+        <uniquenessConstraints>
+            <uniquenessConstraint>
+                <constraint value="sampleType_"/>
+            </uniquenessConstraint>
+        </uniquenessConstraints>
+    </entity>
+    <entity name="_WorkoutSyncExport" representedClassName="_WorkoutSyncExport" syncable="YES">
+        <attribute name="activeEnergyExported" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES"/>
+        <attribute name="attempts" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="basalEnergyExported" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES"/>
+        <attribute name="cadenceExported" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES"/>
+        <attribute name="distanceExported" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES"/>
+        <attribute name="endDate_" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="exerciseTimeExported" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES"/>
+        <attribute name="exported" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES"/>
+        <attribute name="failed" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES"/>
+        <attribute name="heartRateExported" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES"/>
+        <attribute name="heartRateVarExported" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES"/>
+        <attribute name="include" attributeType="Boolean" defaultValueString="YES" usesScalarValueType="YES"/>
+        <attribute name="lastAttempt" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="oxySatExported" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES"/>
+        <attribute name="powerExported" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES"/>
+        <attribute name="routeExported" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES"/>
+        <attribute name="sessionId" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="speedExported" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES"/>
+        <attribute name="startDate_" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="stepExported" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES"/>
+        <attribute name="workoutId_" attributeType="UUID" usesScalarValueType="NO"/>
+        <uniquenessConstraints>
+            <uniquenessConstraint>
+                <constraint value="workoutId_"/>
+            </uniquenessConstraint>
+        </uniquenessConstraints>
+    </entity>
+</model>

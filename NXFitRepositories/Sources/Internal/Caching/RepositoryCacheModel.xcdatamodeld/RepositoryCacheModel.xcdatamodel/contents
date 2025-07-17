@@ -1,0 +1,362 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="23788" systemVersion="24E248" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
+    <entity name="SessionHeartRateZoneSummaryCache" representedClassName="SessionHeartRateZoneSummaryCache" syncable="YES">
+        <attribute name="endDate_" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="eTag" optional="YES" attributeType="String"/>
+        <attribute name="startDate_" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="timeStamp_" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="userId" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <relationship name="items" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="SessionHeartRateZoneSummaryCacheItem" inverseName="parent" inverseEntity="SessionHeartRateZoneSummaryCacheItem"/>
+    </entity>
+    <entity name="SessionHeartRateZoneSummaryCacheItem" representedClassName="SessionHeartRateZoneSummaryCacheItem" syncable="YES">
+        <attribute name="durationInSeconds" attributeType="Integer 32" valueTransformerName="NSSecureUnarchiveFromData" defaultValueString="0" usesScalarValueType="YES" customClassName="Data"/>
+        <attribute name="maxBPM" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="minBPM" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="zoneId" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <relationship name="parent" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="SessionHeartRateZoneSummaryCache" inverseName="items" inverseEntity="SessionHeartRateZoneSummaryCache"/>
+    </entity>
+    <entity name="SessionListCache" representedClassName="SessionListCache" syncable="YES">
+        <attribute name="afterToken" optional="YES" attributeType="String"/>
+        <attribute name="endDate_" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="eTag" optional="YES" attributeType="String"/>
+        <attribute name="filter" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="limit" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="nextUrl" optional="YES" attributeType="String"/>
+        <attribute name="previousUrl" optional="YES" attributeType="String"/>
+        <attribute name="startDate_" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="timeStamp_" attributeType="Date" usesScalarValueType="NO"/>
+        <relationship name="items" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="SessionListCacheItem" inverseName="parent" inverseEntity="SessionListCacheItem"/>
+    </entity>
+    <entity name="SessionListCacheItem" representedClassName="SessionListCacheItem" syncable="YES">
+        <attribute name="activeDurationInSeconds" attributeType="Integer 32" valueTransformerName="NSSecureUnarchiveFromData" defaultValueString="0" usesScalarValueType="YES" customClassName="Data"/>
+        <attribute name="activityType" attributeType="String"/>
+        <attribute name="avgBPM" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="avgCadencePerMinute" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="avgPowerInWatts" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="avgSpeedInMetersPerSecond" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="cadenceUnitFull" optional="YES" attributeType="String"/>
+        <attribute name="cadenceUnitShort" optional="YES" attributeType="String"/>
+        <attribute name="createdDate_" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="distanceInMeters" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="endDate_" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="endDateOffset" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="energyBurnedInCalories" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="maxBPM" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="maxCadencePerMinute" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="maxPowerInWatts" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="maxSpeedInMetersPerSecond" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="maxV02" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="minBPM" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="minCadencePerMinute" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="minPowerInWatts" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="minSpeedInMetersPerSecond" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="sessionId" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="startDate_" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="startDateOffset" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="updatedDate_" attributeType="Date" defaultDateTimeInterval="662709600" usesScalarValueType="NO"/>
+        <attribute name="userId" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="userImageUrl_" attributeType="URI"/>
+        <attribute name="userName_" optional="YES" attributeType="String"/>
+        <relationship name="parent" maxCount="1" deletionRule="Nullify" destinationEntity="SessionListCache" inverseName="items" inverseEntity="SessionListCache"/>
+    </entity>
+    <entity name="SessionMetricsSummaryCache" representedClassName="SessionMetricsSummaryCache" syncable="YES">
+        <attribute name="activeTimeGoalInSeconds" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="activeTimeInSeconds" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="activityCount" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="avgBPM" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="endDate_" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="energyBurnedInCalories" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="eTag" optional="YES" attributeType="String"/>
+        <attribute name="groupBy" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="maxBPM" attributeType="Integer 32" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="minBPM" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="startDate_" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="timeStamp_" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="userId" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+    </entity>
+    <entity name="SourceCache" representedClassName="SourceCache" syncable="YES">
+        <attribute name="appIdentifier" optional="YES" attributeType="String"/>
+        <attribute name="appName" optional="YES" attributeType="String"/>
+        <attribute name="createdOn_" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="deviceHardwareVersion" optional="YES" attributeType="String"/>
+        <attribute name="deviceManufacturer" optional="YES" attributeType="String"/>
+        <attribute name="deviceName" optional="YES" attributeType="String"/>
+        <attribute name="deviceOS" optional="YES" attributeType="String"/>
+        <attribute name="include" attributeType="Boolean" usesScalarValueType="YES"/>
+        <attribute name="integrationDisplayName_" attributeType="String"/>
+        <attribute name="integrationIdentifier_" attributeType="String"/>
+        <attribute name="priority" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="sourceId" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="timeStamp_" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="updatedOn_" attributeType="Date" usesScalarValueType="NO"/>
+        <relationship name="parent" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="SourceListCache" inverseName="items" inverseEntity="SourceListCache"/>
+    </entity>
+    <entity name="SourceListCache" representedClassName="SourceListCache" syncable="YES">
+        <attribute name="eTag" optional="YES" attributeType="String"/>
+        <attribute name="timeStamp_" attributeType="Date" usesScalarValueType="NO"/>
+        <relationship name="items" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="SourceCache" inverseName="parent" inverseEntity="SourceCache"/>
+    </entity>
+    <entity name="UserBadgeCache" representedClassName="UserBadgeCache" syncable="YES">
+        <attribute name="date_" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="eTag" optional="YES" attributeType="String"/>
+        <attribute name="timeStamp_" attributeType="Date" usesScalarValueType="NO"/>
+        <relationship name="items" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="UserBadgeCacheItem" inverseName="parent" inverseEntity="UserBadgeCacheItem"/>
+    </entity>
+    <entity name="UserBadgeCacheItem" representedClassName="UserBadgeCacheItem" syncable="YES">
+        <attribute name="completionDate" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="description_" attributeType="String"/>
+        <attribute name="endDate" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="id" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="imageUrl_" attributeType="URI"/>
+        <attribute name="progress" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="startDate" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="title_" attributeType="String"/>
+        <relationship name="parent" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="UserBadgeCache" inverseName="items" inverseEntity="UserBadgeCache"/>
+    </entity>
+    <entity name="UserCache" representedClassName="UserCache" syncable="YES">
+        <attribute name="dateOfBirth_" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="emailAddress_" attributeType="String"/>
+        <attribute name="eTag" optional="YES" attributeType="String"/>
+        <attribute name="familyName_" attributeType="String"/>
+        <attribute name="givenName_" attributeType="String"/>
+        <attribute name="heartRateZoneThresholds_" attributeType="String"/>
+        <attribute name="imageUrl_" attributeType="URI"/>
+        <attribute name="locationId" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="referenceId" optional="YES" attributeType="String"/>
+        <attribute name="timeStamp_" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="userId" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+    </entity>
+    <entity name="UserProfileCache" representedClassName="UserProfileCache" syncable="YES">
+        <attribute name="eTag" optional="YES" attributeType="String"/>
+        <attribute name="familyName_" attributeType="String"/>
+        <attribute name="givenName_" attributeType="String"/>
+        <attribute name="imageUrl_" attributeType="URI"/>
+        <attribute name="timeStamp_" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="userId" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+    </entity>
+    <entity name="UserSessionCache" representedClassName="UserSessionCache" syncable="YES">
+        <attribute name="activeDurationInSeconds" attributeType="Integer 32" valueTransformerName="NSSecureUnarchiveFromData" defaultValueString="0" usesScalarValueType="YES" customClassName="Data"/>
+        <attribute name="activityId" optional="YES" attributeType="String"/>
+        <attribute name="activityType" attributeType="String"/>
+        <attribute name="avgBPM" optional="YES" attributeType="Double" usesScalarValueType="YES"/>
+        <attribute name="avgCadencePerMinute" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="avgPowerInWatts" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="avgSpeedInMetersPerSecond" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="cadenceUnitFull" optional="YES" attributeType="String"/>
+        <attribute name="cadenceUnitShort" optional="YES" attributeType="String"/>
+        <attribute name="completedDate" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="createdDate_" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="distanceInMeters" optional="YES" attributeType="Double" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="endDate_" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="endDateOffset" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="energyBurnedInCalories" optional="YES" attributeType="Integer 32" usesScalarValueType="YES"/>
+        <attribute name="latitude" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="longitude" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="maxBPM" optional="YES" attributeType="Integer 32" usesScalarValueType="YES"/>
+        <attribute name="maxCadencePerMinute" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="maxPowerInWatts" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="maxSpeedInMetersPerSecond" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="maxV02" optional="YES" attributeType="Double" usesScalarValueType="YES"/>
+        <attribute name="minBPM" optional="YES" attributeType="Integer 32" usesScalarValueType="YES"/>
+        <attribute name="minCadencePerMinute" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="minPowerInWatts" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="minSpeedInMetersPerSecond" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="processedDate" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="sessionId" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="sourceApp" optional="YES" attributeType="String"/>
+        <attribute name="sourceDevice" optional="YES" attributeType="String"/>
+        <attribute name="sourceIntegration_" attributeType="String"/>
+        <attribute name="startDate_" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="startDateOffset" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="syncId" optional="YES" attributeType="String"/>
+        <attribute name="syncVersion" optional="YES" attributeType="String"/>
+        <attribute name="timeStamp_" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="updatedDate_" attributeType="Date" defaultDateTimeInterval="662709600" usesScalarValueType="NO"/>
+        <attribute name="userId" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="userImageUrl_" attributeType="URI"/>
+        <attribute name="userName_" attributeType="String"/>
+        <relationship name="items" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="UserSessionListCache" inverseName="items" inverseEntity="UserSessionListCache"/>
+        <uniquenessConstraints>
+            <uniquenessConstraint>
+                <constraint value="sessionId"/>
+            </uniquenessConstraint>
+        </uniquenessConstraints>
+    </entity>
+    <entity name="UserSessionCadenceSampleCache" representedClassName="UserSessionCadenceSampleCache" syncable="YES">
+        <attribute name="sessionId" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="timeStamp_" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="unitFull_" attributeType="String"/>
+        <attribute name="unitShort_" attributeType="String"/>
+        <relationship name="items" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="UserSessionCadenceSampleCacheItem" inverseName="parent" inverseEntity="UserSessionCadenceSampleCacheItem"/>
+    </entity>
+    <entity name="UserSessionCadenceSampleCacheItem" representedClassName="UserSessionCadenceSampleCacheItem" syncable="YES">
+        <attribute name="activeTimeInSeconds" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="internalInSeconds" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="timestamp" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="valuePerMinute" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <relationship name="parent" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="UserSessionCadenceSampleCache" inverseName="items" inverseEntity="UserSessionCadenceSampleCache"/>
+    </entity>
+    <entity name="UserSessionDistanceSampleCache" representedClassName="UserSessionDistanceSampleCache" syncable="YES">
+        <attribute name="sessionId" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="timeStamp_" attributeType="Date" usesScalarValueType="NO"/>
+        <relationship name="items" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="UserSessionDistanceSampleCacheItem" inverseName="parent" inverseEntity="UserSessionDistanceSampleCacheItem"/>
+    </entity>
+    <entity name="UserSessionDistanceSampleCacheItem" representedClassName="UserSessionDistanceSampleCacheItem" syncable="YES">
+        <attribute name="activeTimeInSeconds" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="intervalInSeconds" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="meters" attributeType="Double" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="timestamp_" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <relationship name="parent" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="UserSessionDistanceSampleCache" inverseName="items" inverseEntity="UserSessionDistanceSampleCache"/>
+    </entity>
+    <entity name="UserSessionEnergyBurnedSampleCache" representedClassName="UserSessionEnergyBurnedSampleCache" syncable="YES">
+        <attribute name="sessionId" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="timeStamp_" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="type" attributeType="Integer 16" usesScalarValueType="YES"/>
+        <relationship name="items" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="UserSessionEnergyBurnedSampleCacheItem" inverseName="parent" inverseEntity="UserSessionEnergyBurnedSampleCacheItem"/>
+    </entity>
+    <entity name="UserSessionEnergyBurnedSampleCacheItem" representedClassName="UserSessionEnergyBurnedSampleCacheItem" syncable="YES">
+        <attribute name="activeTimeInSeconds" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="calories" optional="YES" attributeType="Double" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="intervalInSeconds" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="timestamp_" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <relationship name="parent" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="UserSessionEnergyBurnedSampleCache" inverseName="items" inverseEntity="UserSessionEnergyBurnedSampleCache"/>
+    </entity>
+    <entity name="UserSessionExerciseTimeSampleCache" representedClassName="UserSessionExerciseTimeSampleCache" syncable="YES">
+        <attribute name="sessionId" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="timeStamp_" attributeType="Date" usesScalarValueType="NO"/>
+        <relationship name="items" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="UserSessionExerciseTimeSampleCacheItem" inverseName="parent" inverseEntity="UserSessionExerciseTimeSampleCacheItem"/>
+    </entity>
+    <entity name="UserSessionExerciseTimeSampleCacheItem" representedClassName="UserSessionExerciseTimeSampleCacheItem" syncable="YES">
+        <attribute name="activeTimeInSeconds" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="intervalInSeconds" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="minutes" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="timestamp_" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <relationship name="parent" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="UserSessionExerciseTimeSampleCache" inverseName="items" inverseEntity="UserSessionExerciseTimeSampleCache"/>
+    </entity>
+    <entity name="UserSessionHeartRateSampleCache" representedClassName="UserSessionHeartRateSampleCache" syncable="YES">
+        <attribute name="sessionId" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="timeStamp_" attributeType="Date" usesScalarValueType="NO"/>
+        <relationship name="items" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="UserSessionHeartRateSampleCacheItem" inverseName="parent" inverseEntity="UserSessionHeartRateSampleCacheItem"/>
+    </entity>
+    <entity name="UserSessionHeartRateSampleCacheItem" representedClassName="UserSessionHeartRateSampleCacheItem" syncable="YES">
+        <attribute name="activeTimeInSeconds" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="bpm" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="intervalInSeconds" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="timestamp_" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <relationship name="parent" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="UserSessionHeartRateSampleCache" inverseName="items" inverseEntity="UserSessionHeartRateSampleCache"/>
+    </entity>
+    <entity name="UserSessionHeartRateSummaryCache" representedClassName="UserSessionHeartRateSummaryCache" syncable="YES">
+        <attribute name="intervalSeconds" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="sessionId" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="timeStamp_" attributeType="Date" usesScalarValueType="NO"/>
+        <relationship name="items" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="UserSessionHeartRateSummaryCacheItem" inverseName="parent" inverseEntity="UserSessionHeartRateSummaryCacheItem"/>
+    </entity>
+    <entity name="UserSessionHeartRateSummaryCacheItem" representedClassName="UserSessionHeartRateSummaryCacheItem" syncable="YES">
+        <attribute name="activeTimeInSeconds" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="avgBPM" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="intervalInSeconds" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="maxBPM" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="minBPM" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <relationship name="parent" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="UserSessionHeartRateSummaryCache" inverseName="items" inverseEntity="UserSessionHeartRateSummaryCache"/>
+    </entity>
+    <entity name="UserSessionHeartRateZoneCache" representedClassName="UserSessionHeartRateZoneCache" syncable="YES">
+        <attribute name="sessionId" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="timeStamp_" attributeType="Date" usesScalarValueType="NO"/>
+        <relationship name="items" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="UserSessionHeartRateZoneCacheItem" inverseName="parent" inverseEntity="UserSessionHeartRateZoneCacheItem"/>
+    </entity>
+    <entity name="UserSessionHeartRateZoneCacheItem" representedClassName="UserSessionHeartRateZoneCacheItem" syncable="YES">
+        <attribute name="durationInSeconds" optional="YES" attributeType="Integer 32" valueTransformerName="NSSecureUnarchiveFromData" defaultValueString="0" usesScalarValueType="YES" customClassName="Data"/>
+        <attribute name="maxBPM" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="minBPM" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="zoneId" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <relationship name="parent" maxCount="1" deletionRule="Nullify" destinationEntity="UserSessionHeartRateZoneCache" inverseName="items" inverseEntity="UserSessionHeartRateZoneCache"/>
+    </entity>
+    <entity name="UserSessionHRVSampleCache" representedClassName="UserSessionHRVSampleCache" syncable="YES">
+        <attribute name="sessionId" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="timeStamp_" attributeType="Date" usesScalarValueType="NO"/>
+        <relationship name="items" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="UserSessionHRVSampleCacheItem" inverseName="parent" inverseEntity="UserSessionHRVSampleCacheItem"/>
+    </entity>
+    <entity name="UserSessionHRVSampleCacheItem" representedClassName="UserSessionHRVSampleCacheItem" syncable="YES">
+        <attribute name="activeTimeInSeconds" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="intervalInSeconds" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="timestamp_" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="variabilityMs" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <relationship name="parent" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="UserSessionHRVSampleCache" inverseName="items" inverseEntity="UserSessionHRVSampleCache"/>
+    </entity>
+    <entity name="UserSessionListCache" representedClassName="UserSessionListCache" syncable="YES">
+        <attribute name="afterToken" optional="YES" attributeType="String"/>
+        <attribute name="endDate_" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="eTag" optional="YES" attributeType="String"/>
+        <attribute name="limit" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="nextUrl" optional="YES" attributeType="String"/>
+        <attribute name="previousUrl" optional="YES" attributeType="String"/>
+        <attribute name="startDate_" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="timeStamp_" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="userId" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <relationship name="items" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="UserSessionCache" inverseName="items" inverseEntity="UserSessionCache"/>
+    </entity>
+    <entity name="UserSessionLocationSampleCache" representedClassName="UserSessionLocationSampleCache" syncable="YES">
+        <attribute name="sessionId" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="timeStamp_" attributeType="Date" usesScalarValueType="NO"/>
+        <relationship name="items" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="UserSessionLocationSampleCacheItem" inverseName="parent" inverseEntity="UserSessionLocationSampleCacheItem"/>
+    </entity>
+    <entity name="UserSessionLocationSampleCacheItem" representedClassName="UserSessionLocationSampleCacheItem" syncable="YES">
+        <attribute name="activeTimeInSeconds" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="altitudeInMeters" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="headingInDegrees" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="intervalInSeconds" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="latitude" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="longitude" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="speedInMetersPerSecond" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="timestamp_" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <relationship name="parent" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="UserSessionLocationSampleCache" inverseName="items" inverseEntity="UserSessionLocationSampleCache"/>
+    </entity>
+    <entity name="UserSessionOxygenSaturationSampleCache" representedClassName="UserSessionOxygenSaturationSampleCache" syncable="YES">
+        <attribute name="sessionId" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="timeStamp_" attributeType="Date" usesScalarValueType="NO"/>
+        <relationship name="items" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="UserSessionOxygenSaturationSampleCacheItem" inverseName="parent" inverseEntity="UserSessionOxygenSaturationSampleCacheItem"/>
+    </entity>
+    <entity name="UserSessionOxygenSaturationSampleCacheItem" representedClassName="UserSessionOxygenSaturationSampleCacheItem" syncable="YES">
+        <attribute name="activeTimeInSeconds" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="intervalInSeconds" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="percentage" attributeType="Double" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="timestamp_" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <relationship name="parent" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="UserSessionOxygenSaturationSampleCache" inverseName="items" inverseEntity="UserSessionOxygenSaturationSampleCache"/>
+    </entity>
+    <entity name="UserSessionPowerSampleCache" representedClassName="UserSessionPowerSampleCache" syncable="YES">
+        <attribute name="sessionId" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="timeStamp_" attributeType="Date" usesScalarValueType="NO"/>
+        <relationship name="items" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="UserSessionPowerSampleCacheItem" inverseName="parent" inverseEntity="UserSessionPowerSampleCacheItem"/>
+    </entity>
+    <entity name="UserSessionPowerSampleCacheItem" representedClassName="UserSessionPowerSampleCacheItem" syncable="YES">
+        <attribute name="activeTimeInSeconds" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="intervalInSeconds" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="timestamp_" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="watts" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <relationship name="parent" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="UserSessionPowerSampleCache" inverseName="items" inverseEntity="UserSessionPowerSampleCache"/>
+    </entity>
+    <entity name="UserSessionSpeedSampleCache" representedClassName="UserSessionSpeedSampleCache" syncable="YES">
+        <attribute name="sessionId" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="timeStamp_" attributeType="Date" usesScalarValueType="NO"/>
+        <relationship name="items" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="UserSessionSpeedSampleCacheItem" inverseName="parent" inverseEntity="UserSessionSpeedSampleCacheItem"/>
+    </entity>
+    <entity name="UserSessionSpeedSampleCacheItem" representedClassName="UserSessionSpeedSampleCacheItem" syncable="YES">
+        <attribute name="activeTimeInSeconds" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="intervalInSeconds" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="metersPerSecond" attributeType="Double" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="timestamp_" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <relationship name="parent" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="UserSessionSpeedSampleCache" inverseName="items" inverseEntity="UserSessionSpeedSampleCache"/>
+    </entity>
+    <entity name="UserSessionStepsSampleCache" representedClassName="UserSessionStepsSampleCache" syncable="YES">
+        <attribute name="sessionId" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="timeStamp_" attributeType="Date" usesScalarValueType="NO"/>
+        <relationship name="items" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="UserSessionStepsSampleCacheItem" inverseName="parent" inverseEntity="UserSessionStepsSampleCacheItem"/>
+    </entity>
+    <entity name="UserSessionStepsSampleCacheItem" representedClassName="UserSessionStepsSampleCacheItem" syncable="YES">
+        <attribute name="activeTimeInSeconds" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="count" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="intervalInSeconds" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="timestamp_" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <relationship name="parent" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="UserSessionStepsSampleCache" inverseName="items" inverseEntity="UserSessionStepsSampleCache"/>
+    </entity>
+</model>

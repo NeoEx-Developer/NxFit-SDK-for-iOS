@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="22758" systemVersion="23D56" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
+    <entity name="_Integration" representedClassName="_Integration" syncable="YES">
+        <attribute name="displayName_" attributeType="String"/>
+        <attribute name="identifier_" attributeType="String"/>
+        <attribute name="isConnected" attributeType="Boolean" usesScalarValueType="YES"/>
+        <attribute name="isEnabled" attributeType="Boolean" usesScalarValueType="YES"/>
+        <attribute name="isLocal" attributeType="Boolean" usesScalarValueType="YES"/>
+        <attribute name="logoUrl_" attributeType="URI"/>
+        <attribute name="updatedDate_" attributeType="Date" usesScalarValueType="NO"/>
+        <uniquenessConstraints>
+            <uniquenessConstraint>
+                <constraint value="identifier_"/>
+            </uniquenessConstraint>
+        </uniquenessConstraints>
+    </entity>
+</model>
