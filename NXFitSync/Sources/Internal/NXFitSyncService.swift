@@ -42,6 +42,10 @@ internal class NXFitSyncService : NXFitSync {
         await self.hkManager.disconnect()
     }
     
+    public func isConnected() -> Bool {
+        return HealthKitManager.isConnected(self.userId)
+    }
+    
     public func purgeCache() throws {
         try self.hkManager.purgeCache()
     }

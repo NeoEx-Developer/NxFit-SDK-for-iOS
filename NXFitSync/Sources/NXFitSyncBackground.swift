@@ -35,25 +35,29 @@ public class NXFitSyncBackground {
             logger.info("enableHealthKitBackgroundDelivery: integration not connected for user")
             return
         }
-        
+
         let store = HKHealthStore()
+        let context = HKSyncContext(configProvider, healthStore: store, userId: userId, accessToken: accessToken, isBackgroundDelivery: true)
         
-        _HKQueries.setupWorkoutBackgroundDelivery(configProvider, store, userId: userId, accessToken: accessToken)
-        _HKQueries.setupHealthBloodPressureBackgroundDelivery(configProvider, store, userId: userId, accessToken: accessToken)
-        _HKQueries.setupHealthBackgroundDelivery(configProvider, store, for: .bodyFatPercentage, and: BodyFatSampleDto.self, userId: userId, accessToken: accessToken)
-        _HKQueries.setupHealthBackgroundDelivery(configProvider, store, for: .bodyMassIndex, and: BodyMassIndexSampleDto.self, userId: userId, accessToken: accessToken)
-        _HKQueries.setupHealthBackgroundDelivery(configProvider, store, for: .bodyMass, and: BodyMassSampleDto.self, userId: userId, accessToken: accessToken)
-        _HKQueries.setupHealthBackgroundDelivery(configProvider, store, for: .bodyTemperature, and: BodyTemperatureSampleDto.self, userId: userId, accessToken: accessToken)
-        _HKQueries.setupHealthBackgroundDelivery(configProvider, store, for: .heartRate, and: HeartRateSampleDto.self, userId: userId, accessToken: accessToken)
-        _HKQueries.setupHealthBackgroundDelivery(configProvider, store, for: .heartRateVariabilitySDNN, and: HeartRateVariabilitySampleDto.self, userId: userId, accessToken: accessToken)
-        _HKQueries.setupHealthBackgroundDelivery(configProvider, store, for: .height, and: HeightSampleDto.self, userId: userId, accessToken: accessToken)
-        _HKQueries.setupHealthBackgroundDelivery(configProvider, store, for: .oxygenSaturation, and: OxygenSaturationSampleDto.self, userId: userId, accessToken: accessToken)
-        _HKQueries.setupHealthBackgroundDelivery(configProvider, store, for: .respiratoryRate, and: RespiratoryRateSampleDto.self, userId: userId, accessToken: accessToken)
-        _HKQueries.setupHealthBackgroundDelivery(configProvider, store, for: .restingHeartRate, and: HeartRateSampleDto.self, userId: userId, accessToken: accessToken)
-        _HKQueries.setupHealthBackgroundDelivery(configProvider, store, for: .vo2Max, and: VO2MaxSampleDto.self, userId: userId, accessToken: accessToken)
+        _HKQueries.setupWorkoutBackgroundDelivery(store, context)
+        _HKQueries.setupHealthBloodPressureBackgroundDelivery(store, context)
+        _HKQueries.setupHealthBackgroundDelivery(store, context, for: .bodyFatPercentage, and: BodyFatSampleDto.self)
+        _HKQueries.setupHealthBackgroundDelivery(store, context, for: .bodyMassIndex, and: BodyMassIndexSampleDto.self)
+        _HKQueries.setupHealthBackgroundDelivery(store, context, for: .bodyMass, and: BodyMassSampleDto.self)
+        _HKQueries.setupHealthBackgroundDelivery(store, context, for: .bodyTemperature, and: BodyTemperatureSampleDto.self)
+        _HKQueries.setupHealthBackgroundDelivery(store, context, for: .heartRate, and: HeartRateSampleDto.self)
+        _HKQueries.setupHealthBackgroundDelivery(store, context, for: .heartRateVariabilitySDNN, and: HeartRateVariabilitySampleDto.self)
+        _HKQueries.setupHealthBackgroundDelivery(store, context, for: .height, and: HeightSampleDto.self)
+        _HKQueries.setupHealthBackgroundDelivery(store, context, for: .oxygenSaturation, and: OxygenSaturationSampleDto.self)
+        _HKQueries.setupHealthBackgroundDelivery(store, context, for: .respiratoryRate, and: RespiratoryRateSampleDto.self)
+        _HKQueries.setupHealthBackgroundDelivery(store, context, for: .restingHeartRate, and: HeartRateSampleDto.self)
+        _HKQueries.setupHealthBackgroundDelivery(store, context, for: .vo2Max, and: VO2MaxSampleDto.self)
+        
+        logger.info("enableHealthKitBackgroundDelivery: background delivery enabled")
     }
     
     public static func disableHealthkitBackgroundDelivery() -> Void {
+        let logger = Logging.create(identifier: String(describing: NXFitSyncBackground.self))
         let store = HKHealthStore()
         
         _HKQueries.stopWorkoutBackgroundDelivery(store)
@@ -69,5 +73,7 @@ public class NXFitSyncBackground {
         _HKQueries.stopHealthBackgroundDelivery(store, for: .respiratoryRate)
         _HKQueries.stopHealthBackgroundDelivery(store, for: .restingHeartRate)
         _HKQueries.stopHealthBackgroundDelivery(store, for: .vo2Max)
+        
+        logger.info("disableHealthkitBackgroundDelivery: background delivery disabled")
     }
 }

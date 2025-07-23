@@ -25,13 +25,13 @@ internal class HKHealthSyncTask<T : BaseHealthSampleDto> where T : HealthSampleC
     }
     
     internal func run() async -> Void {
-        self.logger.trace("run<\(String(describing: T.self))>: Syncing health samples; background delivery: \(self.context.isBackgroundDelivery)")
+        self.logger.debug("run<\(String(describing: T.self))>: Syncing health samples; background delivery: \(self.context.isBackgroundDelivery)")
         
         do {
             let authResult = try await self.context.healthStore.statusForAuthorizationRequest(toShare: [], read: [.quantityType(forIdentifier: self.quantityType)!])
             
             guard authResult == .unnecessary else {
-                self.logger.trace("run<\(String(describing: T.self))>: Aborting sync task, permission prompt is required for given type \(String(describing: self.quantityType))")
+                self.logger.debug("run<\(String(describing: T.self))>: Aborting sync task, permission prompt is required for given type \(String(describing: self.quantityType))")
                 
                 return
             }
@@ -41,7 +41,7 @@ internal class HKHealthSyncTask<T : BaseHealthSampleDto> where T : HealthSampleC
             
             (anchor, mappedSourcesAndSamples) = try await _HKQueries.getHealthSamples(self.logger, self.context.healthStore, for: quantityType, anchor: anchor)
             
-            self.logger.trace("run<\(String(describing: T.self))>: \(mappedSourcesAndSamples?.count ?? 0) sources with samples found; background delivery: \(self.context.isBackgroundDelivery)")
+            self.logger.debug("run<\(String(describing: T.self))>: \(mappedSourcesAndSamples?.count ?? 0) sources with samples found; background delivery: \(self.context.isBackgroundDelivery)")
             
             if let mappedSourcesAndSamples = mappedSourcesAndSamples, mappedSourcesAndSamples.count > 0 {
                 try await self.sendHealthSamples(sampleEndpoint: ApiSampleType.map(quantityType).endpoint, mappedSourcesAndSamples: mappedSourcesAndSamples)
@@ -81,7 +81,7 @@ internal class HKHealthSyncTask<T : BaseHealthSampleDto> where T : HealthSampleC
         for (source, samples) in mappedSourcesAndSamples {
             let count = samples.count
 
-            self.logger.trace("sendHealthSamples<\(String(describing: T.self))>: \(count) samples found; background delivery: \(self.context.isBackgroundDelivery)")
+            self.logger.debug("sendHealthSamples<\(String(describing: T.self))>: \(count) samples found; background delivery: \(self.context.isBackgroundDelivery)")
             
             if count > self.segmentSize {
                 let segments = Int(ceil((Double(count) / Double(self.segmentSize))))

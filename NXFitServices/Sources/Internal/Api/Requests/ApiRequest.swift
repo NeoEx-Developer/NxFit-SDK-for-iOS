@@ -138,19 +138,19 @@ internal class ApiRequest {
     }
     
     private static func processUnsuccessfulResponse(_ id: UUID, response: URLResponse, for request: URLRequest, with body: Data?) -> ApiError {
-        ApiLogger.instance.trace("API \(id.uuidString); processUnsuccessfulResponse: HTTP \(request.httpMethod ?? "") request unsuccessful response for: \(response.url?.absoluteString ?? "no URL")")
+        ApiLogger.instance.debug("API \(id.uuidString); processUnsuccessfulResponse: HTTP \(request.httpMethod ?? "") request unsuccessful response for: \(response.url?.absoluteString ?? "no URL")")
         
         guard let resp = response as? HTTPURLResponse else {
             return ApiError.unknown
         }
         
-        ApiLogger.instance.trace("API \(id.uuidString); processUnsuccessfulResponse: Status code: \(resp.statusCode)")
+        ApiLogger.instance.debug("API \(id.uuidString); processUnsuccessfulResponse: Status code: \(resp.statusCode)")
 
         var responseBody: String? = nil
         if let body = body, !body.isEmpty {
             responseBody = String(data: body, encoding: .utf8)
             
-            ApiLogger.instance.trace("API \(id.uuidString); processUnsuccessfulResponse: Response body: \(responseBody ?? "N/A")")
+            ApiLogger.instance.debug("API \(id.uuidString); processUnsuccessfulResponse: Response body: \(responseBody ?? "N/A")")
         }
         
         switch(resp.statusCode) {

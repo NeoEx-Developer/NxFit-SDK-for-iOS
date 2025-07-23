@@ -66,7 +66,7 @@ internal class IntegrationManager: NSObject, ObservableObject, IntegrationManagi
     public func canHandleUrl(_ url: URL) -> Bool {
         let canHandle = url.absoluteString.hasPrefix(redirectUrl)
         
-        self.logger.trace("canHandleUrl; URL: \(url.absoluteString); can handle? \(canHandle)")
+        self.logger.debug("canHandleUrl; URL: \(url.absoluteString); can handle? \(canHandle)")
         
         return canHandle
     }
@@ -76,12 +76,12 @@ internal class IntegrationManager: NSObject, ObservableObject, IntegrationManagi
         
         do {
             guard let cachedIntegration = await dataManager.getIntegration(with: integration.identifier) else {
-                self.logger.trace("Cached integration not found; identifier: \(integration.identifier)")
+                self.logger.debug("Cached integration not found; identifier: \(integration.identifier)")
                 throw IntegrationError.notFound
             }
             
             if cachedIntegration.isLocal {
-                self.logger.trace("Handling local integration connect; identifier: \(integration.identifier)")
+                self.logger.debug("Handling local integration connect; identifier: \(integration.identifier)")
                 throw IntegrationError.invalidIntegrationType
             }
             
@@ -111,12 +111,12 @@ internal class IntegrationManager: NSObject, ObservableObject, IntegrationManagi
         
         do {
             guard let cachedIntegration = await dataManager.getIntegration(with: integration.identifier) else {
-                self.logger.trace("Cached integration not found; identifier: \(integration.identifier)")
+                self.logger.debug("Cached integration not found; identifier: \(integration.identifier)")
                 throw IntegrationError.notFound
             }
             
             if !cachedIntegration.isLocal {
-                self.logger.trace("Handling local integration connect; identifier: \(integration.identifier)")
+                self.logger.debug("Handling local integration connect; identifier: \(integration.identifier)")
                 throw IntegrationError.invalidIntegrationType
             }
             
@@ -137,17 +137,17 @@ internal class IntegrationManager: NSObject, ObservableObject, IntegrationManagi
     public func disconnect(_ integration: IntegrationModel) async throws -> Void {
         do {
             guard let cachedIntegration = await dataManager.getIntegration(with: integration.identifier) else {
-                self.logger.trace("Cached integration not found; identifier: \(integration.identifier)")
+                self.logger.debug("Cached integration not found; identifier: \(integration.identifier)")
                 throw IntegrationError.notFound
             }
 
             if cachedIntegration.isLocal {
-                self.logger.trace("Local integration disconnect; identifier: \(integration.identifier)")
+                self.logger.debug("Local integration disconnect; identifier: \(integration.identifier)")
                 throw IntegrationError.invalidIntegrationType
             }
             
             if !cachedIntegration.isConnected {
-                self.logger.trace("Integration already disconnected; identifier: \(integration.identifier)")
+                self.logger.debug("Integration already disconnected; identifier: \(integration.identifier)")
                 return
             }
             
@@ -165,19 +165,19 @@ internal class IntegrationManager: NSObject, ObservableObject, IntegrationManagi
     public func disconnect(_ integration: IntegrationModel, disconnectLocalIntegrationCallback: () async throws -> Void) async throws -> Void {
         do {
             guard let cachedIntegration = await dataManager.getIntegration(with: integration.identifier) else {
-                self.logger.trace("Cached integration not found; identifier: \(integration.identifier)")
+                self.logger.debug("Cached integration not found; identifier: \(integration.identifier)")
                 throw IntegrationError.notFound
             }
 
             if !cachedIntegration.isLocal {
-                self.logger.trace("Remote integration disconnect; identifier: \(integration.identifier)")
+                self.logger.debug("Remote integration disconnect; identifier: \(integration.identifier)")
                 throw IntegrationError.invalidIntegrationType
             }
             
             try await disconnectLocalIntegrationCallback()
             
             if !cachedIntegration.isConnected {
-                self.logger.trace("Integration already disconnected; identifier: \(integration.identifier)")
+                self.logger.debug("Integration already disconnected; identifier: \(integration.identifier)")
                 return
             }
 
@@ -221,7 +221,7 @@ internal class IntegrationManager: NSObject, ObservableObject, IntegrationManagi
         connectingIntegration = nil
         
         if canHandleUrl(url), let (identifier, result) = parseUrl(url) {
-            self.logger.trace("Remote integration handling url; identifier: \(identifier); result: \(result)")
+            self.logger.debug("Remote integration handling url; identifier: \(identifier); result: \(result)")
             
             await updateAndPublish(identifier, isConnected: result)
             
@@ -306,7 +306,7 @@ internal class IntegrationManager: NSObject, ObservableObject, IntegrationManagi
     
     @MainActor
     internal func notifyStatus(_ integration: IntegrationModel, status: IntegrationConnectionStatus) async -> Void {
-        self.logger.trace("notifyStatus: Notifying for integration status change: integration: \(String(describing: integration)), status: \(String(describing: status))")
+        self.logger.debug("notifyStatus: Notifying for integration status change: integration: \(String(describing: integration)), status: \(String(describing: status))")
         
         switch status {
             case .connectSuccess:

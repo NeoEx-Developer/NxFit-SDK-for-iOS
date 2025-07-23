@@ -28,7 +28,7 @@ internal class _HKQueries {
                     }
 
                     guard let samples = samples as? [HKCorrelation] else {
-                        logger.trace("getHealthBloodPressureSamples: Failed to retrieve samples")
+                        logger.debug("getHealthBloodPressureSamples: Failed to retrieve samples")
                         continuation.resume(returning: (nil, nil))
                         return
                     }
@@ -75,7 +75,7 @@ internal class _HKQueries {
                     }
 
                     guard let newSamples = newSamples as? [HKQuantitySample] else {
-                        logger.trace("getHealthSamples<\(String(describing: T.self))>: Failed to retrieve samples")
+                        logger.debug("getHealthSamples<\(String(describing: T.self))>: Failed to retrieve samples")
                         continuation.resume(returning: (nil, nil))
                         return
                     }
@@ -116,7 +116,7 @@ internal class _HKQueries {
                     }
                     
                     guard let samples = samples as? [HKWorkout], !samples.isEmpty else {
-                        logger.trace("getWorkout: Failed to retrieve workout")
+                        logger.debug("getWorkout: Failed to retrieve workout")
                         continuation.resume(returning: nil)
                         return
                     }
@@ -185,7 +185,7 @@ internal class _HKQueries {
                     }
                     
                     guard let samples = samples as? [HKWorkoutRoute] else {
-                        logger.trace("getWorkoutRoute: Failed to retrieve workout routes")
+                        logger.debug("getWorkoutRoute: Failed to retrieve workout routes")
                         return
                     }
                     
@@ -208,7 +208,7 @@ internal class _HKQueries {
                     }
                     
                     guard let locations = locations else {
-                        logger.trace("getWorkoutRouteLocations: Failed to retrieve workout route locations")
+                        logger.debug("getWorkoutRouteLocations: Failed to retrieve workout route locations")
                         return
                     }
                     
@@ -242,7 +242,7 @@ internal class _HKQueries {
                     }
 
                     guard let workouts = workouts as? [HKWorkout] else {
-                        logger.trace("getWorkouts: Failed to retrieve workouts")
+                        logger.debug("getWorkouts: Failed to retrieve workouts")
                         continuation.resume(returning: (nil, nil))
                         return
                     }
@@ -284,7 +284,7 @@ internal class _HKQueries {
         return workoutSamples
     }
     
-    internal static func setupHealthBloodPressureBackgroundDelivery(_ configProvider: ConfigurationProviding, _ store: HKHealthStore, userId: Int, accessToken: String) -> Void {
+    internal static func setupHealthBloodPressureBackgroundDelivery(_ store: HKHealthStore, _ context: HKSyncContext) -> Void {
         let query = HKObserverQuery(sampleType: .quantityType(forIdentifier: .bloodPressureSystolic)!, predicate: nil, updateHandler: { query, handler, error in
             if let error = error {
                 let logger = Logging.create(identifier: String(describing: _HKQueries.self))
@@ -294,8 +294,7 @@ internal class _HKQueries {
             }
 
             Task {
-                let syncContext = HKSyncContext(configProvider, healthStore: HKHealthStore(), userId: userId, accessToken: accessToken, isBackgroundDelivery: true)
-                let task = HKBloodPressureHealthSyncTask(syncContext)
+                let task = HKBloodPressureHealthSyncTask(context)
                 
                 await task.run()
             }
@@ -314,7 +313,7 @@ internal class _HKQueries {
         }
     }
     
-    internal static func setupHealthBackgroundDelivery<T : BaseHealthSampleDto>(_ configProvider: ConfigurationProviding, _ store: HKHealthStore, for quantityType: HKQuantityTypeIdentifier, and type: T.Type, userId: Int, accessToken: String) -> Void where T : HealthSampleCreating {
+    internal static func setupHealthBackgroundDelivery<T : BaseHealthSampleDto>(_ store: HKHealthStore, _ context: HKSyncContext, for quantityType: HKQuantityTypeIdentifier, and type: T.Type) -> Void where T : HealthSampleCreating {
         let query = HKObserverQuery(sampleType: .quantityType(forIdentifier: quantityType)!, predicate: nil, updateHandler: { query, handler, error in
             if let error = error {
                 let logger = Logging.create(identifier: String(describing: _HKQueries.self))
@@ -324,8 +323,7 @@ internal class _HKQueries {
             }
 
             Task {
-                let syncContext = HKSyncContext(configProvider, healthStore: HKHealthStore(), userId: userId, accessToken: accessToken, isBackgroundDelivery: true)
-                let task = HKHealthSyncTask<T>(syncContext, quantityType: quantityType)
+                let task = HKHealthSyncTask<T>(context, quantityType: quantityType)
                 
                 await task.run()
             }
@@ -353,7 +351,7 @@ internal class _HKQueries {
         }
     }
     
-    internal static func setupWorkoutBackgroundDelivery(_ configProvider: ConfigurationProviding, _ store: HKHealthStore, userId: Int, accessToken: String) -> Void {
+    internal static func setupWorkoutBackgroundDelivery(_ store: HKHealthStore, _ context: HKSyncContext, ) -> Void {
         let query = HKObserverQuery(sampleType: .workoutType(), predicate: nil, updateHandler: { query, handler, error in
             if let error = error {
                 let logger = Logging.create(identifier: String(describing: _HKQueries.self))
@@ -363,8 +361,7 @@ internal class _HKQueries {
             }
 
             Task {
-                let syncContext = HKSyncContext(configProvider, healthStore: HKHealthStore(), userId: userId, accessToken: accessToken, isBackgroundDelivery: true)
-                let task = HKWorkoutSyncTask(syncContext)
+                let task = HKWorkoutSyncTask(context)
                 
                 await task.run()
             }

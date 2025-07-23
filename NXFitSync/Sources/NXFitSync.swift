@@ -41,6 +41,8 @@ public protocol NXFitSync {
     
     func disconnect() async -> Void
     
+    func isConnected() -> Bool
+    
     func purgeCache() throws -> Void
     
     /// In the event of any workouts failing to export,  this function will reset any failed exports and attempt to re-export.

@@ -62,11 +62,13 @@ internal class HealthKitManager {
     
     public func connect() async -> Void {
         guard self.authManager.isAuthenticated() else {
-            self.logger.trace("sync: User not authenticated")
+            self.logger.error("connect: User not authenticated")
             return
         }
 
         guard !self.isConnected else {
+            self.logger.error("connect: HealthKit already connected")
+            
             await setState(to: .initial)
             return
         }
@@ -82,20 +84,26 @@ internal class HealthKitManager {
 
         await self.setConnected(self.authManager.getUserId(), connected: true)
         
+        self.logger.info("connect: HealthKit connected")
+        
         await self.initialize()
     }
     
     public func disconnect() async -> Void {
         guard self.authManager.isAuthenticated() else {
-            self.logger.trace("sync: User not authenticated")
+            self.logger.error("disconnect: User not authenticated")
             return
         }
         
         await self.setConnected(self.authManager.getUserId(), connected: false)
         
+        self.logger.info("disconnect: HealthKit disconnected")
+        
         await MainActor.run {
             self.initializeState = .uninitialized
         }
+        
+        NXFitSyncBackground.disableHealthkitBackgroundDelivery()
         
         await setState(to: .initial)
     }
@@ -106,55 +114,68 @@ internal class HealthKitManager {
 
     public func resetAndRetry() async -> Void {
         guard self.authManager.isAuthenticated(), let accessToken = self.authManager.getAccessToken() else {
-            self.logger.trace("resetAndRetry: User not authenticated")
+            self.logger.error("resetAndRetry: User not authenticated")
             return
         }
+        
+        self.logger.info("resetAndRetry: Syncing")
         
         let context = HKSyncContext(self.configProvider, healthStore: self.healthStoreClient.store, userId: self.authManager.getUserId(), accessToken: accessToken)
         
         await context.syncDataManager.resetFailedWorkouts()
         
+        self.logger.debug("resetAndRetry: Syncing workouts")
         await HKWorkoutSyncTask(context).run()
-
+        self.logger.debug("resetAndRetry: Syncing workouts complete")
+        
         let failures = await context.syncDataManager.getTotalFailedWorkoutExports()
         if failures > 0 {
+            self.logger.debug("resetAndRetry: Failed workouts: \(failures)")
             await setState(to: .completeWithFailures(failures))
         }
         else {
             await setState(to: .complete)
         }
+        
+        self.logger.info("resetAndRetry: Sync complete")
     }
     
     public func sync() async -> Void {
         guard self.syncStatusPublisher.value.isReady() else {
-            self.logger.trace("sync: HealthKit is not yet ready to sync")
+            self.logger.debug("sync: HealthKit is not yet ready to sync")
             return
         }
         
         guard self.authManager.isAuthenticated(), let accessToken = self.authManager.getAccessToken() else {
-            self.logger.trace("sync: User not authenticated")
+            self.logger.error("sync: User not authenticated")
             return
         }
+
+        self.logger.info("sync: Syncing")
         
-        let context = HKSyncContext(self.configProvider, healthStore: self.healthStoreClient.store, userId: self.authManager.getUserId(), accessToken: accessToken)
+        let context = HKSyncContext(self.configProvider, healthStore: self.healthStoreClient.store, userId: self.authManager.getUserId(), accessToken: accessToken, publisher: self.syncStatusPublisher)
 
         await self.setState(to: .processing(context.stats))
         
-        self.logger.trace("sync: Syncing health samples")
+        self.logger.debug("sync: Syncing health samples")
         await self.syncHealth(context)
+        self.logger.debug("sync: Syncing health samples complete")
         
-        self.logger.trace("sync: Syncing workouts")
+        self.logger.debug("sync: Syncing workouts")
         await self.syncWorkouts(context)
+        self.logger.debug("sync: Syncing workouts complete")
         
         let failures = await context.syncDataManager.getTotalFailedWorkoutExports()
-        self.logger.trace("sync: Failed workouts: \(failures)")
         
         if failures > 0 {
+            self.logger.debug("sync: Failed workouts: \(failures)")
             await setState(to: .completeWithFailures(failures))
         }
         else {
             await setState(to: .complete)
         }
+        
+        self.logger.info("sync: Sync complete")
     }
     
     public var syncStatus: AnyPublisher<HKSyncState, Never> {
@@ -171,18 +192,18 @@ internal class HealthKitManager {
     
     private func initialize() async -> Void {
         guard self.initializeState == .uninitialized else {
-            self.logger.trace("initialize: Already initialized or initializing")
+            self.logger.error("initialize: Already initialized or initializing")
             return
         }
         
         guard self.isConnected else {
-            self.logger.trace("initialize: not connected")
+            self.logger.error("initialize: not connected")
             await setState(to: .initial)
             return
         }
 
         guard self.authManager.isAuthenticated() else {
-            self.logger.trace("initialize: User not authenticated")
+            self.logger.error("initialize: User not authenticated")
             await setState(to: .initial)
             return
         }
@@ -211,6 +232,8 @@ internal class HealthKitManager {
         }
         
         await setState(to: .ready)
+        
+        self.logger.info("initialize: initialized")
     }
     
     private func setConnected(_ userId: Int, connected: Bool) async -> Void {
@@ -225,7 +248,7 @@ internal class HealthKitManager {
     private func setState(to state: HKSyncState) async -> Void {
         self.syncStatusPublisher.send(state)
         
-        self.logger.trace("State updated to \(String(describing: state))")
+        self.logger.debug("setState: State updated to \(String(describing: state))")
     }
 
     private func syncHealth(_ context: HKSyncContext) async -> Void {

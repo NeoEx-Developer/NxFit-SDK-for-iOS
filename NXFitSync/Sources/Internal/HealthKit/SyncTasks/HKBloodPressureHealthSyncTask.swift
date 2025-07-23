@@ -22,7 +22,7 @@ internal class HKBloodPressureHealthSyncTask {
     }
     
     internal func run() async -> Void {
-        self.logger.trace("run<BloodPressureSampleDto>: Syncing health samples; background delivery: \(self.context.isBackgroundDelivery)")
+        self.logger.debug("run<BloodPressureSampleDto>: Syncing health samples; background delivery: \(self.context.isBackgroundDelivery)")
         
         do {
             let authResult = try await self.context.healthStore.statusForAuthorizationRequest(toShare: [], read: [
@@ -31,7 +31,7 @@ internal class HKBloodPressureHealthSyncTask {
             ])
             
             guard authResult == .unnecessary else {
-                self.logger.trace("run<BloodPressureSampleDto>: Aborting sync task, permission prompt is required for given type bloodPressureSystolic & bloodPressureDiastolic")
+                self.logger.debug("run<BloodPressureSampleDto>: Aborting sync task, permission prompt is required for given type bloodPressureSystolic & bloodPressureDiastolic")
                 
                 return
             }
@@ -41,7 +41,7 @@ internal class HKBloodPressureHealthSyncTask {
             
             (anchor, mappedSourcesAndSamples) = try await _HKQueries.getHealthBloodPressureSamples(self.logger, self.context.healthStore, anchor: anchor)
             
-            self.logger.trace("run<BloodPressureSampleDto>: \(mappedSourcesAndSamples?.count ?? 0) sources with samples found; background delivery: \(self.context.isBackgroundDelivery)")
+            self.logger.debug("run<BloodPressureSampleDto>: \(mappedSourcesAndSamples?.count ?? 0) sources with samples found; background delivery: \(self.context.isBackgroundDelivery)")
             
             if let mappedSourcesAndSamples = mappedSourcesAndSamples, mappedSourcesAndSamples.count > 0 {
                 try await self.sendHealthSamples(mappedSourcesAndSamples: mappedSourcesAndSamples)
@@ -83,7 +83,7 @@ internal class HKBloodPressureHealthSyncTask {
         for (source, samples) in mappedSourcesAndSamples {
             let count = samples.count
 
-            self.logger.trace("sendHealthSamples<BloodPressureSampleDto>: \(count) samples found; background delivery: \(self.context.isBackgroundDelivery)")
+            self.logger.debug("sendHealthSamples<BloodPressureSampleDto>: \(count) samples found; background delivery: \(self.context.isBackgroundDelivery)")
             
             if count > self.segmentSize {
                 let segments = Int(ceil((Double(count) / Double(self.segmentSize))))

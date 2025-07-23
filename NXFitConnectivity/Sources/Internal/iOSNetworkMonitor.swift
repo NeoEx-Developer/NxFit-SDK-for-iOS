@@ -37,7 +37,7 @@ package final class iOSNetworkMonitor : ConnectivityStatusProviding {
             
             self?.isConnected = isConnected
             self?.connectionType = connectionType
-            self?.logger.trace("Connected? \(isConnected) via \(String(describing: connectionType))")
+            self?.logger.debug("Connected? \(isConnected) via \(String(describing: connectionType))")
         }
         
         self.monitor?.start(queue: queue)

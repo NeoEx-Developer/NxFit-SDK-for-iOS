@@ -23,7 +23,7 @@ internal class HKWorkoutSyncTask {
     }
     
     internal func run() async -> Void {
-        self.logger.trace("run<Workout>: Syncing workouts; background delivery: \(self.context.isBackgroundDelivery)")
+        self.logger.debug("run<Workout>: Syncing workouts; background delivery: \(self.context.isBackgroundDelivery)")
         
         do {
             try await loadWorkouts()
@@ -40,7 +40,7 @@ internal class HKWorkoutSyncTask {
             if resp.completedOn != nil {
                 await context.syncDataManager.setWorkoutSessionId(workout: workout, sessionId: resp.sessionId)
                 
-                self.logger.trace("checkWorkoutAlreadyExported: workout already exported; session id: \(resp.sessionId); activity id: \(workoutId)")
+                self.logger.debug("checkWorkoutAlreadyExported: workout already exported; session id: \(resp.sessionId); activity id: \(workoutId)")
                 
                 throw HealthKitError.workoutAlreadyExported
             }
@@ -48,7 +48,7 @@ internal class HKWorkoutSyncTask {
             return resp.sessionId
         }
         catch ApiError.notFound {
-            self.logger.trace("checkWorkoutAlreadyExported: workout not yet exported; activity id: \(workoutId)")
+            self.logger.debug("checkWorkoutAlreadyExported: workout not yet exported; activity id: \(workoutId)")
             
             return nil
         }
@@ -74,11 +74,13 @@ internal class HKWorkoutSyncTask {
     }
     
     private func loadWorkouts() async throws -> Void {
-        self.logger.trace("loadWorkouts: Loading workouts")
+        self.logger.debug("loadWorkouts: Loading workouts")
         
         let anchor = await getWorkoutAnchor()
         let (newAnchor, workouts) = try await _HKQueries.getWorkouts(self.logger, self.context.healthStore, anchor: anchor)
 
+        self.logger.debug("loadWorkouts: Found \(workouts?.count ?? 0) workouts")
+        
         if let newAnchor = newAnchor {
             try await saveWorkoutAnchor(anchor: newAnchor)
         }
@@ -89,12 +91,12 @@ internal class HKWorkoutSyncTask {
     }
     
     private func processWorkout(toExport workoutExport: _WorkoutSyncExport) async throws -> Void {
-        self.logger.trace("processWorkout: Processing workout; id: \(workoutExport.workoutId)")
+        self.logger.debug("processWorkout: Processing workout; id: \(workoutExport.workoutId)")
         
         var sessionId: Int?
         
         guard let workout = await _HKQueries.getWorkout(self.logger, self.context.healthStore, workoutId: workoutExport.workoutId) else {
-            self.logger.trace("processWorkout: Cached workout not found in store; id: \(workoutExport.workoutId)")
+            self.logger.debug("processWorkout: Cached workout not found in store; id: \(workoutExport.workoutId)")
             throw HealthKitError.workoutNotFound
         }
         
@@ -137,7 +139,7 @@ internal class HKWorkoutSyncTask {
         }
 
         guard let sessionId = sessionId else {
-            self.logger.trace("processWorkout: No session id available")
+            self.logger.debug("processWorkout: No session id available")
             throw HealthKitError.noSessionIdAvailable
         }
         
@@ -162,41 +164,47 @@ internal class HKWorkoutSyncTask {
 
         try await context.sessionApi.completeSession(userId: context.userId, sessionId: sessionId)
         
-        self.logger.trace("processWorkout: Export complete; session id: \(sessionId)")
+        self.logger.debug("processWorkout: Export complete; session id: \(sessionId)")
     }
     
     private func processWorkouts() async throws -> Void {
-        self.logger.trace("processWorkouts: Processing workouts")
+        self.logger.debug("processWorkouts: Processing workouts")
         
         let totalWorkouts = await context.syncDataManager.getTotalWorkoutsToExport()
 
-        await self.context.setTotalWorkoutsToExport(totalWorkoutsToExport: totalWorkouts)
-        
-        var workout = await context.syncDataManager.getNextWorkoutToExport()
-        
-        while (workout != nil) {
-            if let workout = workout {
-                do {
-                    try await processWorkout(toExport: workout)
-                    
-                    await context.syncDataManager.setWorkoutExported(workout: workout)
-                    await context.incrementWorkoutsExported()
+        if totalWorkouts > 0 {
+            self.logger.debug("processWorkouts: Processing \(totalWorkouts) workouts")
+            
+            await self.context.setTotalWorkoutsToExport(totalWorkoutsToExport: totalWorkouts)
+            
+            var workout = await context.syncDataManager.getNextWorkoutToExport()
+            
+            while (workout != nil) {
+                if let workout = workout {
+                    do {
+                        try await processWorkout(toExport: workout)
+                        
+                        await context.syncDataManager.setWorkoutExported(workout: workout)
+                        await context.incrementWorkoutsExported()
+                    }
+                    catch HealthKitError.workoutAlreadyExported {
+                        await context.syncDataManager.setWorkoutExported(workout: workout)
+                        await context.incrementWorkoutsExported()
+                    }
+                    catch {
+                        self.logger.error("process: Failed to export workout; error: \(error)")
+                        await context.syncDataManager.setWorkoutExportAttempt(workout: workout)
+                        await context.incrementWorkoutsExportFailed()
+                    }
                 }
-                catch HealthKitError.workoutAlreadyExported {
-                    await context.syncDataManager.setWorkoutExported(workout: workout)
-                    await context.incrementWorkoutsExported()
-                }
-                catch {
-                    self.logger.error("process: Failed to export workout; error: \(error)")
-                    await context.syncDataManager.setWorkoutExportAttempt(workout: workout)
-                    await context.incrementWorkoutsExportFailed()
-                }
+                
+                workout = await context.syncDataManager.getNextWorkoutToExport()
+                
+                usleep(100 * 1000) //100ms
             }
-            
-            workout = await context.syncDataManager.getNextWorkoutToExport()
-            
-            usleep(100 * 1000) //100ms
         }
+        
+        self.logger.debug("processWorkouts: Processing complete")
     }
     
     private func saveWorkoutAnchor(anchor: HKQueryAnchor) async throws -> Void {
@@ -210,7 +218,7 @@ internal class HKWorkoutSyncTask {
     private func sendWorkoutSamples<T : BaseSessionSampleChunkDto>(sampleEndpoint: ApiSessionSampleEndpoint, sessionId: Int, samples: [T]) async throws -> Void {
         let count = samples.count
         
-        self.logger.trace("sendWorkoutSamples<\(String(describing: T.self))>: \(count) samples found")
+        self.logger.debug("sendWorkoutSamples<\(String(describing: T.self))>: \(count) samples found")
 
         let segments = Int(ceil((Double(count) / Double(segmentSize))))
         
@@ -237,10 +245,10 @@ internal class HKWorkoutSyncTask {
     }
     
     private func syncWorkoutCadenceSamples(_ workoutExport: _WorkoutSyncExport, sessionId: Int, workout: HKWorkout) async throws -> Void {
-        self.logger.trace("syncWorkoutCadenceSamples: Syncing cadence samples for workout; id: \(workoutExport.workoutId)")
+        self.logger.debug("syncWorkoutCadenceSamples: Syncing cadence samples for workout; id: \(workoutExport.workoutId)")
         
         guard !workoutExport.getExported(forType: .cadence) else {
-            self.logger.trace("syncWorkoutCadenceSamples: Samples already exported for workout; id: \(workoutExport.workoutId)")
+            self.logger.debug("syncWorkoutCadenceSamples: Samples already exported for workout; id: \(workoutExport.workoutId)")
             return
         }
 
@@ -251,13 +259,15 @@ internal class HKWorkoutSyncTask {
         }
         
         await context.syncDataManager.setWorkoutSamplesExported(workout: workoutExport, sampleType: .cadence)
+        
+        self.logger.debug("syncWorkoutCadenceSamples: Syncing cadence samples for workout complete; id: \(workoutExport.workoutId)")
     }
     
     private func syncWorkoutDistanceSamples(_ workoutExport: _WorkoutSyncExport, sessionId: Int, workout: HKWorkout) async throws -> Void {
-        self.logger.trace("syncWorkoutDistanceSamples: Syncing distance samples for workout; id: \(workoutExport.workoutId)")
+        self.logger.debug("syncWorkoutDistanceSamples: Syncing distance samples for workout; id: \(workoutExport.workoutId)")
         
         guard !workoutExport.getExported(forType: .distance) else {
-            self.logger.trace("syncWorkoutDistanceSamples: Samples already exported for workout; id: \(workoutExport.workoutId)")
+            self.logger.debug("syncWorkoutDistanceSamples: Samples already exported for workout; id: \(workoutExport.workoutId)")
             return
         }
 
@@ -270,13 +280,15 @@ internal class HKWorkoutSyncTask {
         }
         
         await context.syncDataManager.setWorkoutSamplesExported(workout: workoutExport, sampleType: .distance)
+        
+        self.logger.debug("syncWorkoutDistanceSamples: Syncing distance samples for workout complete; id: \(workoutExport.workoutId)")
     }
     
     private func syncWorkoutLocationSamples(_ workoutExport: _WorkoutSyncExport, sessionId: Int, workout: HKWorkout) async throws -> Void {
-        self.logger.trace("processLocationSamples: Syncing location samples for workout; id: \(workoutExport.workoutId)")
+        self.logger.debug("processLocationSamples: Syncing location samples for workout; id: \(workoutExport.workoutId)")
         
         guard !workoutExport.routeExported else {
-            self.logger.trace("processLocationSamples: Location samples already exported for workout; id: \(workoutExport.workoutId)")
+            self.logger.debug("processLocationSamples: Location samples already exported for workout; id: \(workoutExport.workoutId)")
             return
         }
         
@@ -288,7 +300,7 @@ internal class HKWorkoutSyncTask {
             }
         }
         else {
-            self.logger.trace("processLocationSamples: No Location samples found; extracting location metadata where available for workout; id: \(workoutExport.workoutId)")
+            self.logger.debug("processLocationSamples: No Location samples found; extracting location metadata where available for workout; id: \(workoutExport.workoutId)")
             
             let lat = workout.metadata?[HKConstants.latitudeKey] as? Double
             let lng = workout.metadata?[HKConstants.longitudeKey] as? Double
@@ -308,13 +320,15 @@ internal class HKWorkoutSyncTask {
         }
         
         await context.syncDataManager.setWorkoutLocationSamplesExported(workout: workoutExport)
+        
+        self.logger.debug("syncWorkoutLocationSamples: Syncing location samples for workout complete; id: \(workoutExport.workoutId)")
     }
     
     private func syncWorkoutPowerSamples(_ workoutExport: _WorkoutSyncExport, sessionId: Int, workout: HKWorkout) async throws -> Void {
-        self.logger.trace("processPowerSamples: Syncing power samples for workout; id: \(workoutExport.workoutId)")
+        self.logger.debug("processPowerSamples: Syncing power samples for workout; id: \(workoutExport.workoutId)")
         
         guard !workoutExport.getExported(forType: .power) else {
-            self.logger.trace("processPowerSamples: Samples already exported for workout; id: \(workoutExport.workoutId)")
+            self.logger.debug("processPowerSamples: Samples already exported for workout; id: \(workoutExport.workoutId)")
             return
         }
 
@@ -333,13 +347,15 @@ internal class HKWorkoutSyncTask {
         }
         
         await context.syncDataManager.setWorkoutSamplesExported(workout: workoutExport, sampleType: .power)
+        
+        self.logger.debug("processPowerSamples: Syncing power samples for workout complete; id: \(workoutExport.workoutId)")
     }
     
     private func syncWorkoutSpeedSamples(_ workoutExport: _WorkoutSyncExport, sessionId: Int, workout: HKWorkout) async throws -> Void {
-        self.logger.trace("processSpeedSamples: Syncing speed samples for workout; id: \(workoutExport.workoutId)")
+        self.logger.debug("processSpeedSamples: Syncing speed samples for workout; id: \(workoutExport.workoutId)")
         
         guard !workoutExport.getExported(forType: .speed) else {
-            self.logger.trace("processSpeedSamples: Samples already exported for workout; id: \(workoutExport.workoutId)")
+            self.logger.debug("processSpeedSamples: Samples already exported for workout; id: \(workoutExport.workoutId)")
             return
         }
 
@@ -358,15 +374,17 @@ internal class HKWorkoutSyncTask {
         }
         
         await context.syncDataManager.setWorkoutSamplesExported(workout: workoutExport, sampleType: .speed)
+        
+        self.logger.debug("processSpeedSamples: Syncing speed samples for workout complete; id: \(workoutExport.workoutId)")
     }
     
     private func syncWorkoutSamples<T : BaseSessionSampleChunkDto>(_ workoutExport: _WorkoutSyncExport, sessionId: Int, workout: HKWorkout, quantityType: HKQuantityTypeIdentifier, and: T.Type) async throws -> Void where T : SessionSampleChunkCreating {
-        self.logger.trace("syncWorkoutSamples<\(String(describing: T.self))>: Syncing samples for workout; id: \(workoutExport.workoutId)")
+        self.logger.debug("syncWorkoutSamples<\(String(describing: T.self))>: Syncing samples for workout; id: \(workoutExport.workoutId)")
         
         let sampleType = ApiSessionSampleType.map(quantityType)
         
         guard !workoutExport.getExported(forType: sampleType) else {
-            self.logger.trace("syncWorkoutSamples<\(String(describing: T.self))>: Samples already exported for workout; id: \(workoutExport.workoutId)")
+            self.logger.debug("syncWorkoutSamples<\(String(describing: T.self))>: Samples already exported for workout; id: \(workoutExport.workoutId)")
             return
         }
 
@@ -377,6 +395,8 @@ internal class HKWorkoutSyncTask {
         }
         
         await context.syncDataManager.setWorkoutSamplesExported(workout: workoutExport, sampleType: sampleType)
+        
+        self.logger.debug("syncWorkoutSamples<\(String(describing: T.self))>: Syncing samples for workout complete; id: \(workoutExport.workoutId)")
     }
     
     private func updateExistingCompleteStatus() async -> Void {
