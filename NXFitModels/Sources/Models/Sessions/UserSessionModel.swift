@@ -14,11 +14,6 @@ public struct UserSessionModel : Identifiable {
     /// Int identifier for the session.
     public let id: Int
     
-    /// String activity identifier for the session.
-    ///
-    /// Only available to resource owner.
-    public let activityId: String?
-    
     /// Activity type for the session.
     public let activityType: ApiActivityType
     
@@ -73,7 +68,6 @@ public struct UserSessionModel : Identifiable {
     /// Default constructor for the ``UserSessionModel`` model.
     /// - Parameters:
     ///   - id: Int identifier for the session.
-    ///   - activityId: String activity identifier for the session. Only available to resource owner.
     ///   - activityType: Activity type for the session.
     ///   - user: Details of the session owner.
     ///   - activeDurationInSeconds: Total duration of the session, measured in seconds.
@@ -91,7 +85,6 @@ public struct UserSessionModel : Identifiable {
     ///   - metadata: Metadata for the session.
     public init(
         id: Int,
-        activityId: String?,
         activityType: ApiActivityType,
         user: SessionUserDetailsModel,
         activeDurationInSeconds: Int,
@@ -109,7 +102,6 @@ public struct UserSessionModel : Identifiable {
         metadata: ExtendedSessionMetadataModel
     ) {
         self.id = id
-        self.activityId = activityId
         self.activityType = activityType
         self.user = user
         self.activeDurationInSeconds = activeDurationInSeconds

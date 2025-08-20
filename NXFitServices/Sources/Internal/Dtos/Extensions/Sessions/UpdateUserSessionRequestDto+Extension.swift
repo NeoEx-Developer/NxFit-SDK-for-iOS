@@ -9,7 +9,6 @@ import NXFitModels
 
 extension UpdateUserSessionRequestDto {
     internal init(model: UpdateUserSessionRequestModel) {
-        self.activityId = model.activityId
         self.activityType = model.activityType
         self.syncId = model.syncId
         self.syncVersion = model.syncVersion

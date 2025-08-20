@@ -11,7 +11,6 @@ import NXFitModels
 
 internal struct UserSessionDto : Decodable {
     internal let id: Int
-    internal let activityId: String?
     internal let activityType: ApiActivityType
     internal let user: SessionUserDetailsDto
     internal let activeDurationInSeconds: Int
@@ -30,7 +29,6 @@ internal struct UserSessionDto : Decodable {
     
     private enum CodingKeys: String, CodingKey {
         case id
-        case activityId
         case activityType
         case user
         case activeDurationInSeconds
@@ -50,7 +48,6 @@ internal struct UserSessionDto : Decodable {
 
     internal init(
         id: Int,
-        activityId: String?,
         activityType: ApiActivityType,
         user: SessionUserDetailsDto,
         activeDurationInSeconds: Int,
@@ -68,7 +65,6 @@ internal struct UserSessionDto : Decodable {
         metadata: ExtendedSessionMetadataDto
     ) {
         self.id = id
-        self.activityId = activityId
         self.activityType = activityType
         self.user = user
         self.activeDurationInSeconds = activeDurationInSeconds
@@ -90,7 +86,6 @@ internal struct UserSessionDto : Decodable {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         
         self.id = try container.decode(Int.self, forKey: .id)
-        self.activityId = try container.decodeIfPresent(String.self, forKey: .activityId)
         self.activityType = try container.decode(ApiActivityType.self, forKey: .activityType)
         self.user = try container.decode(SessionUserDetailsDto.self, forKey: .user)
         self.activeDurationInSeconds = try container.decode(Int.self, forKey: .activeDurationInSeconds)

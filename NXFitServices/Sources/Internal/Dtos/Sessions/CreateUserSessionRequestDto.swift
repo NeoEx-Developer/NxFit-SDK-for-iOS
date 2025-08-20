@@ -9,7 +9,7 @@ import NXFitCommon
 import NXFitModels
 
 internal struct CreateUserSessionRequestDto : Encodable {
-    internal let activityId: String
+    internal let externalId: String
     internal let activityType: ApiActivityType
     internal let activeDurationInSeconds: Int
     internal let integrationIdentifier: String
@@ -32,7 +32,7 @@ internal struct CreateUserSessionRequestDto : Encodable {
     
     private enum CodingKeys: String, CodingKey {
         case
-            activityId,
+            externalId,
             activityType,
             activeDurationInSeconds,
             integrationIdentifier,
@@ -55,7 +55,7 @@ internal struct CreateUserSessionRequestDto : Encodable {
     }
     
     internal init(
-        activityId: String,
+        externalId: String,
         activityType: ApiActivityType,
         activeDurationInSeconds: Int,
         integrationIdentifier: String,
@@ -76,7 +76,7 @@ internal struct CreateUserSessionRequestDto : Encodable {
         startedOnLocal: DateTimeZone,
         endedOnLocal: DateTimeZone
     ) {
-        self.activityId = activityId
+        self.externalId = externalId
         self.activityType = activityType
         self.activeDurationInSeconds = activeDurationInSeconds
         self.integrationIdentifier = integrationIdentifier
@@ -101,7 +101,7 @@ internal struct CreateUserSessionRequestDto : Encodable {
     internal func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         
-        try container.encode(activityId, forKey: .activityId)
+        try container.encode(externalId, forKey: .externalId)
         try container.encode(activityType, forKey: .activityType)
         try container.encode(activeDurationInSeconds, forKey: .activeDurationInSeconds)
         try container.encode(integrationIdentifier, forKey: .integrationIdentifier)

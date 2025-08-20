@@ -11,7 +11,6 @@ extension UserSessionModel {
     internal init(dto: UserSessionDto) {
         self.init(
             id: dto.id,
-            activityId: dto.activityId,
             activityType: dto.activityType,
             user: SessionUserDetailsModel(dto: dto.user),
             activeDurationInSeconds: dto.activeDurationInSeconds,

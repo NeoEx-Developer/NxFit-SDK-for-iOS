@@ -10,7 +10,6 @@ import NXFitCommon
 import NXFitModels
 
 internal struct UpdateUserSessionRequestDto : Encodable {
-    internal let activityId: String
     internal let activityType: ApiActivityType
     internal let startedOnLocal: DateTimeZone
     internal let endedOnLocal: DateTimeZone
@@ -20,7 +19,6 @@ internal struct UpdateUserSessionRequestDto : Encodable {
     
     private enum CodingKeys: String, CodingKey {
         case
-            activityId,
             activityType,
             syncId,
             syncVersion,
@@ -30,7 +28,6 @@ internal struct UpdateUserSessionRequestDto : Encodable {
     }
     
     internal init(
-        activityId: String,
         activityType: ApiActivityType,
         syncId: String?,
         syncVersion: String?,
@@ -38,7 +35,6 @@ internal struct UpdateUserSessionRequestDto : Encodable {
         endedOnLocal: DateTimeZone,
         completedOn: Date?
     ) {
-        self.activityId = activityId
         self.activityType = activityType
         self.syncId = syncId
         self.syncVersion = syncVersion
@@ -50,7 +46,6 @@ internal struct UpdateUserSessionRequestDto : Encodable {
     internal func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         
-        try container.encode(activityId, forKey: .activityId)
         try container.encode(activityType, forKey: .activityType)
         try container.encode(syncId, forKey: .syncId)
         try container.encode(syncVersion, forKey: .syncVersion)

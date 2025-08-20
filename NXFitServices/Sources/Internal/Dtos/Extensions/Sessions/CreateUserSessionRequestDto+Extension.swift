@@ -9,7 +9,7 @@ import NXFitModels
 
 extension CreateUserSessionRequestDto {
     internal init(model: CreateUserSessionRequestModel) {
-        self.activityId = model.activityId
+        self.externalId = model.externalId
         self.activityType = model.activityType
         self.activeDurationInSeconds = model.activeDurationInSeconds
         self.integrationIdentifier = model.integrationIdentifier

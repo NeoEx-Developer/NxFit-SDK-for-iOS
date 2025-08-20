@@ -136,7 +136,6 @@
     </entity>
     <entity name="UserSessionCache" representedClassName="UserSessionCache" syncable="YES">
         <attribute name="activeDurationInSeconds" attributeType="Integer 32" valueTransformerName="NSSecureUnarchiveFromData" defaultValueString="0" usesScalarValueType="YES" customClassName="Data"/>
-        <attribute name="activityId" optional="YES" attributeType="String"/>
         <attribute name="activityType" attributeType="String"/>
         <attribute name="avgBPM" optional="YES" attributeType="Double" usesScalarValueType="YES"/>
         <attribute name="avgCadencePerMinute" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>

@@ -16,7 +16,6 @@ extension UserSessionCache {
     }
 
     @NSManaged internal var activeDurationInSeconds: Int32
-    @NSManaged internal var activityId: String?
     @NSManaged internal var activityType: String
     @NSManaged internal var cadenceUnitFull: String?
     @NSManaged internal var cadenceUnitShort: String?

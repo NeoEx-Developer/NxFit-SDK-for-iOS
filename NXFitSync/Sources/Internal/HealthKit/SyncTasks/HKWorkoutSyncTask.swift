@@ -36,7 +36,7 @@ internal class HKWorkoutSyncTask {
     
     private func checkWorkoutAlreadyExported(workout: _WorkoutSyncExport, workoutId: UUID) async throws -> Int? {
         do {
-            let resp = try await context.syncApi.lookupSessionSyncDetailsByActivityId(workoutId.uuidString)
+            let resp = try await context.syncApi.lookupSessionSyncDetailsByExternalId(workoutId.uuidString)
             if resp.completedOn != nil {
                 await context.syncDataManager.setWorkoutSessionId(workout: workout, sessionId: resp.sessionId)
                 
@@ -112,7 +112,7 @@ internal class HKWorkoutSyncTask {
             let res = try await context.sessionApi.createSession(
                 userId: context.userId,
                 data: CreateUserSessionRequestModel(
-                    activityId: workout.uuid.uuidString,
+                    externalId: workout.uuid.uuidString,
                     activityType: ApiActivityType.map(workout.workoutActivityType),
                     activeDurationInSeconds: Int(round(workout.duration)),
                     integrationIdentifier: SyncConstants.appleIntegrationIdentifier,
@@ -402,7 +402,7 @@ internal class HKWorkoutSyncTask {
     private func updateExistingCompleteStatus() async -> Void {
         if let completeWorkouts = try? await context.syncApi.listSessionSyncDetails().results {
            for workout in completeWorkouts {
-               if let workoutId = UUID(uuidString: workout.activityId) {
+               if let workoutId = UUID(uuidString: workout.externalId) {
                    await context.syncDataManager.setWorkoutExported(workoutId: workoutId, sessionId: workout.sessionId)
                }
            }

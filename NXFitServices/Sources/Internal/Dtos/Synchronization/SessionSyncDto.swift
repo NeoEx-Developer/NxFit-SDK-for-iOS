@@ -9,7 +9,7 @@ import Foundation
 
 internal struct SessionSyncDto : Decodable {
     internal let sessionId: Int
-    internal let activityId: String
+    internal let externalId: String
     internal let sourceId: Int
     internal let completedOn: Date?
 }

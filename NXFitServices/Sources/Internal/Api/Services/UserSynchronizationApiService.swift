@@ -35,9 +35,9 @@ package class UserSynchronizationApiService : BaseApiService, UserSynchronizatio
             .asCollectionResponse(modelProvider: SessionSyncModel.init)
     }
     
-    public func lookupSessionSyncDetailsByActivityId(_ activityId: String) async throws -> SessionSyncModel {
+    public func lookupSessionSyncDetailsByExternalId(_ externalId: String) async throws -> SessionSyncModel {
         return try await ApiRequest
-            .get("user/synchronization/sessions/\(activityId)")
+            .get("user/synchronization/sessions/\(externalId)")
             .withBaseUrl(self.baseUrl)
             .withBearer(self.accessToken)
             .withRetry(.exponential())

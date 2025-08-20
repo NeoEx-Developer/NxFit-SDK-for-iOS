@@ -9,7 +9,7 @@ import Foundation
 import NXFitCommon
 
 public struct CreateUserSessionRequestModel {
-    public let activityId: String
+    public let externalId: String
     public let activityType: ApiActivityType
     public let activeDurationInSeconds: Int
     public let integrationIdentifier: String
@@ -31,7 +31,7 @@ public struct CreateUserSessionRequestModel {
     public let endedOnLocal: DateTimeZone
     
     public init(
-        activityId: String,
+        externalId: String,
         activityType: ApiActivityType,
         activeDurationInSeconds: Int,
         integrationIdentifier: String,
@@ -52,7 +52,7 @@ public struct CreateUserSessionRequestModel {
         startedOnLocal: DateTimeZone,
         endedOnLocal: DateTimeZone
     ) {
-        self.activityId = activityId
+        self.externalId = externalId
         self.activityType = activityType
         self.activeDurationInSeconds = activeDurationInSeconds
         self.integrationIdentifier = integrationIdentifier

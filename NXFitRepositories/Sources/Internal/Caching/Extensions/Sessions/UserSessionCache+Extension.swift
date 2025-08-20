@@ -55,7 +55,6 @@ extension UserSessionCache : ModelProviding {
     internal func asModel() -> UserSessionModel {
         return UserSessionModel(
             id: Int(self.sessionId),
-            activityId: self.activityId,
             activityType: ApiActivityType(rawValue: self.activityType) ?? .other,
             user: SessionUserDetailsModel(id: Int(self.userId), name: self.userName, imageUrl: self.userImageUrl),
             activeDurationInSeconds: Int(self.activeDurationInSeconds),

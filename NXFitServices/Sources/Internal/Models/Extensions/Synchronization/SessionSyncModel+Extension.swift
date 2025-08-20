@@ -11,7 +11,7 @@ extension SessionSyncModel {
     internal init(dto: SessionSyncDto) {
         self.init(
             sessionId: dto.sessionId,
-            activityId: dto.activityId,
+            externalId: dto.externalId,
             sourceId: dto.sourceId,
             completedOn: dto.completedOn
         )

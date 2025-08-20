@@ -148,7 +148,6 @@ internal class CacheDataManager {
             let cache = existingCache ?? UserSessionCache(context: self.backgroundCtx!)
 
             cache.sessionId = Int32(session.id)
-            cache.activityId = session.activityId
             cache.activityType = session.activityType.rawValue
             cache.userId = Int32(session.user.id)
             cache.userName = session.user.name
@@ -1403,7 +1402,6 @@ internal class CacheDataManager {
         let cache = getUserSessionCache(sessionId) ?? UserSessionCache(context: self.backgroundCtx!)
 
         cache.sessionId = Int32(session.id)
-        cache.activityId = session.activityId
         cache.activityType = session.activityType.rawValue
         cache.userId = Int32(session.user.id)
         cache.userName = session.user.name

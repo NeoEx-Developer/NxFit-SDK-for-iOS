@@ -9,7 +9,6 @@ import Foundation
 import NXFitCommon
 
 public struct UpdateUserSessionRequestModel {
-    public let activityId: String
     public let activityType: ApiActivityType
     public let startedOnLocal: DateTimeZone
     public let endedOnLocal: DateTimeZone
