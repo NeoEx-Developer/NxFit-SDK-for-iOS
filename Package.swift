@@ -72,7 +72,8 @@ let package = Package(
         .target(
             name: "NXFitSync",
             dependencies: ["NXFitAuth", "NXFitCommon", "NXFitConfig", "NXFitConnectivity", "NXFitModels", "NXFitServices"],
-            path: "NXFitSync/Sources"
+            path: "NXFitSync/Sources",
+            resources: [.process("Resources/PrivacyInfo.xcprivacy")]
         ),
     ]
 )
