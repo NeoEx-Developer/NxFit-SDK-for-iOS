@@ -35,8 +35,6 @@ extension _Integration {
             identifier: identifier,
             displayName: displayName,
             logoUrl: logoUrl,
-            isLocal: isLocal,
-            isEnabled: isEnabled,
             isConnected: isConnected,
             updatedOn: updatedDate
         )

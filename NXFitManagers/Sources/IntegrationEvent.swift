@@ -10,8 +10,8 @@ import NXFitModels
 
 /// Integration events
 public enum IntegrationEvent {
-    case connected(integration: IntegrationModel),
-         disconnected(integration: IntegrationModel),
-         connectionFailed(integration: IntegrationModel),
-         disconnectFailed(integration: IntegrationModel)
+    case connected(_ integrationIdentifier: String),
+         disconnected(_ integrationIdentifier: String),
+         connectionFailed(_ integrationIdentifier: String),
+         disconnectFailed(_ integrationIdentifier: String)
 }

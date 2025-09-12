@@ -12,15 +12,18 @@ import NXFitConfig
 import NXFitServices
 
 internal class _HKQueries {
+    private static let healthObjectLimit: Int = 20000
+    private static let monthsBackToQuery: Int = 1
+    
     internal static func getHealthBloodPressureSamples(_ logger: Logger, _ store: HKHealthStore, anchor: HKQueryAnchor?) async throws -> (HKQueryAnchor?, Dictionary<SyncSource, [BloodPressureSampleDto]>?) {
         let calendar = Calendar.current
-        let startDate = calendar.date(byAdding: .month, value: -3, to: Date.now)
+        let startDate = calendar.date(byAdding: .month, value: -monthsBackToQuery, to: Date.now)
         let systolicType = HKObjectType.quantityType(forIdentifier: .bloodPressureSystolic)!
         let diastolicType = HKObjectType.quantityType(forIdentifier: .bloodPressureDiastolic)!
         
         return try await withCheckedThrowingContinuation({ (continuation: CheckedContinuation<(HKQueryAnchor?, Dictionary<SyncSource, [BloodPressureSampleDto]>?), Error>) in
             store.execute(
-                HKAnchoredObjectQuery(type: .correlationType(forIdentifier: .bloodPressure)!, predicate: HKQuery.predicateForSamples(withStart: startDate, end: nil), anchor: anchor, limit: HKObjectQueryNoLimit, resultsHandler: { (query, samples, deletedObjects, newAnchor, error) in
+                HKAnchoredObjectQuery(type: .correlationType(forIdentifier: .bloodPressure)!, predicate: HKQuery.predicateForSamples(withStart: startDate, end: nil), anchor: anchor, limit: healthObjectLimit, resultsHandler: { (query, samples, deletedObjects, newAnchor, error) in
                     if let error = error {
                         logger.error("getHealthBloodPressureSamples: Failed to retrieve samples; error: \(error)")
                         continuation.resume(throwing: error)
@@ -63,11 +66,11 @@ internal class _HKQueries {
     
     internal static func getHealthSamples<T : BaseHealthSampleDto>(_ logger: Logger, _ store: HKHealthStore, for quantityType: HKQuantityTypeIdentifier, anchor: HKQueryAnchor?) async throws -> (HKQueryAnchor?, Dictionary<SyncSource, [T]>?) where T : HealthSampleCreating {
         let calendar = Calendar.current
-        let startDate = calendar.date(byAdding: .month, value: -3, to: Date.now)
+        let startDate = calendar.date(byAdding: .month, value: -monthsBackToQuery, to: Date.now)
         
         let (anchor, samples) = try await withCheckedThrowingContinuation({ (continuation: CheckedContinuation<(HKQueryAnchor?, [HKQuantitySample]?), Error>) in
             store.execute(
-                HKAnchoredObjectQuery(type: .quantityType(forIdentifier: quantityType)!, predicate: HKQuery.predicateForSamples(withStart: startDate, end: nil), anchor: anchor, limit: HKObjectQueryNoLimit, resultsHandler: { (query, newSamples, deletedObjects, newAnchor, error) in
+                HKAnchoredObjectQuery(type: .quantityType(forIdentifier: quantityType)!, predicate: HKQuery.predicateForSamples(withStart: startDate, end: nil), anchor: anchor, limit: healthObjectLimit, resultsHandler: { (query, newSamples, deletedObjects, newAnchor, error) in
                     if let error = error {
                         logger.error("getHealthSamples<\(String(describing: T.self))>: Failed to retrieve samples; error: \(error)")
                         continuation.resume(throwing: error)
@@ -230,7 +233,7 @@ internal class _HKQueries {
     
     internal static func getWorkouts(_ logger: Logger, _ store: HKHealthStore, anchor: HKQueryAnchor? = nil) async throws -> (HKQueryAnchor?, [HKWorkout]?) {
         let calendar = Calendar.current
-        let startDate = calendar.date(byAdding: .month, value: -3, to: Date.now)
+        let startDate = calendar.date(byAdding: .month, value: -monthsBackToQuery, to: Date.now)
         
         let (anchor, workouts) = try await withCheckedThrowingContinuation({ (continuation: CheckedContinuation<(HKQueryAnchor?, [HKWorkout]?), Error>) in
             store.execute(

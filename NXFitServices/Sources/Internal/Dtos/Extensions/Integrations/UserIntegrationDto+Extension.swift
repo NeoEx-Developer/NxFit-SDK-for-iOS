@@ -13,8 +13,6 @@ extension UserIntegrationDto {
             identifier: self.identifier,
             displayName: self.displayName,
             logoUrl: self.logoUrl,
-            isLocal: self.isLocal,
-            isEnabled: self.isEnabled,
             isConnected: self.isConnected,
             updatedOn: self.updatedOn
         )
@@ -27,8 +25,6 @@ extension IntegrationModel {
             identifier: dto.identifier,
             displayName: dto.displayName,
             logoUrl: dto.logoUrl,
-            isLocal: dto.isLocal,
-            isEnabled: dto.isEnabled,
             isConnected: dto.isConnected,
             updatedOn: dto.updatedOn
         )

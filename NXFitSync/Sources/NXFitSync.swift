@@ -7,6 +7,7 @@
 
 import Foundation
 import Combine
+import NXFitServices
 
 /// Services providing functions to manage HealthKit connectivity & synchronization.
 ///
@@ -14,7 +15,7 @@ import Combine
 ///
 /// See <doc:Integrations_iOS> for further details.
 ///
-/// If background delivery is enabled then ``sync()`` does not need to be manually called else ``sync()`` can be called whenever required.
+/// If background delivery is enabled then ``syncHealth()`` or ``syncWorkouts()`` does not need to be manually called else ``syncHealth()`` and ``syncWorkouts()`` can be called whenever required after the ``HKSyncState/ready`` state is published.
 ///
 /// ### Events
 /// An event is sent for sync state changes and stat updates available via ``HealthKitManager/syncStatus``.
@@ -36,21 +37,30 @@ import Combine
 ///
 /// - ``HKSyncStats/samplesToExport``: number of samples to check and export
 /// - ``HKSyncStats/samplesExported``: number of samples complete
-public protocol NXFitSync {
+public protocol NXFitSync : LocalIntegrationsClient {
+    /// Starts the connection process for HealthKit on the device.
+    /// The HealthKit permission prompt will be shown on initial connection and when new permissions are added.
     func connect() async -> Void
     
+    /// Disconnects the HealthKit integration on the device, disabling the sync processes.
     func disconnect() async -> Void
     
+    /// Returns the current connection state of HealthKit on the device.
     func isConnected() -> Bool
     
+    /// Clears any cached workout data.
     func purgeCache() throws -> Void
     
     /// In the event of any workouts failing to export,  this function will reset any failed exports and attempt to re-export.
     func resetAndRetry() async -> Void
     
-    /// Triggers the sync mangement and handlers for workouts and samples to extract and export to NXFit.
+    /// Triggers the sync mangement and handlers for workouts to extract and export to NXFit.
     /// It is not necessary to call this function after the initial connection unless background delivery is disabled.
-    func sync() async -> Void
+    func syncWorkouts() async -> Void
+    
+    /// Triggers the sync mangement and handlers for health samples to extract and export to NXFit.
+    /// It is not necessary to call this function after the initial connection unless background delivery is disabled.
+    func syncHealth() async -> Void
     
     /// Get the current sync process state.
     /// - Returns: Current ``HKSyncState`` status of the sync manager.

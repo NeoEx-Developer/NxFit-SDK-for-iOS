@@ -54,8 +54,12 @@ internal class NXFitSyncService : NXFitSync {
         await self.hkManager.resetAndRetry()
     }
     
-    public func sync() async {
-        await self.hkManager.sync()
+    public func syncHealth() async {
+        await self.hkManager.syncHealth()
+    }
+    
+    public func syncWorkouts() async {
+        await self.hkManager.syncWorkouts()
     }
     
     public var syncStatus: AnyPublisher<HKSyncState, Never> {

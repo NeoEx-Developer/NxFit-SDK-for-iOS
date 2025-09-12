@@ -62,14 +62,6 @@ internal class HKWorkoutSyncTask {
             return anchor
         }
         
-        if let anchor = try? await context.syncApi.getAnchor(.workout) {
-            if let data = try? NSKeyedArchiver.archivedData(withRootObject: anchor, requiringSecureCoding: true) {
-                UserDefaults.standard.set(data, forKey: "\(SyncConstants.appleWorkoutAnchorUserDefaults)_\(context.userId)")
-            }
-            
-            return anchor
-        }
-        
         return nil
     }
     
@@ -145,22 +137,18 @@ internal class HKWorkoutSyncTask {
         
         await context.syncDataManager.setWorkoutSessionId(workout: workoutExport, sessionId: sessionId)
         
-        try await withThrowingTaskGroup(of: Void.self) { tasks in
-            tasks.addTask { try await self.syncWorkoutSamples(workoutExport, sessionId: sessionId, workout: workout, quantityType: .activeEnergyBurned, and: EnergySessionSampleChunkDto.self) }
-            tasks.addTask { try await self.syncWorkoutSamples(workoutExport, sessionId: sessionId, workout: workout, quantityType: .appleExerciseTime, and: ExerciseTimeSessionSampleChunkDto.self) }
-            tasks.addTask { try await self.syncWorkoutSamples(workoutExport, sessionId: sessionId, workout: workout, quantityType: .basalEnergyBurned, and: EnergySessionSampleChunkDto.self) }
-            tasks.addTask { try await self.syncWorkoutSamples(workoutExport, sessionId: sessionId, workout: workout, quantityType: .heartRate, and: HeartRateSessionSampleChunkDto.self) }
-            tasks.addTask { try await self.syncWorkoutSamples(workoutExport, sessionId: sessionId, workout: workout, quantityType: .heartRateVariabilitySDNN, and: HeartRateVariabilitySessionSampleChunkDto.self) }
-            tasks.addTask { try await self.syncWorkoutSamples(workoutExport, sessionId: sessionId, workout: workout, quantityType: .oxygenSaturation, and: OxygenSaturationSessionSampleChunkDto.self) }
-            tasks.addTask { try await self.syncWorkoutSamples(workoutExport, sessionId: sessionId, workout: workout, quantityType: .stepCount, and: StepCountSessionSampleChunkDto.self) }
-            tasks.addTask { try await self.syncWorkoutCadenceSamples(workoutExport, sessionId: sessionId, workout: workout) }
-            tasks.addTask { try await self.syncWorkoutDistanceSamples(workoutExport, sessionId: sessionId, workout: workout) }
-            tasks.addTask { try await self.syncWorkoutLocationSamples(workoutExport, sessionId: sessionId, workout: workout) }
-            tasks.addTask { try await self.syncWorkoutPowerSamples(workoutExport, sessionId: sessionId, workout: workout) }
-            tasks.addTask { try await self.syncWorkoutSpeedSamples(workoutExport, sessionId: sessionId, workout: workout) }
-            
-            try await tasks.next()
-        }
+        try await self.syncWorkoutSamples(workoutExport, sessionId: sessionId, workout: workout, quantityType: .activeEnergyBurned, and: EnergySessionSampleChunkDto.self)
+        try await self.syncWorkoutSamples(workoutExport, sessionId: sessionId, workout: workout, quantityType: .appleExerciseTime, and: ExerciseTimeSessionSampleChunkDto.self)
+        try await self.syncWorkoutSamples(workoutExport, sessionId: sessionId, workout: workout, quantityType: .basalEnergyBurned, and: EnergySessionSampleChunkDto.self)
+        try await self.syncWorkoutSamples(workoutExport, sessionId: sessionId, workout: workout, quantityType: .heartRate, and: HeartRateSessionSampleChunkDto.self)
+        try await self.syncWorkoutSamples(workoutExport, sessionId: sessionId, workout: workout, quantityType: .heartRateVariabilitySDNN, and: HeartRateVariabilitySessionSampleChunkDto.self)
+        try await self.syncWorkoutSamples(workoutExport, sessionId: sessionId, workout: workout, quantityType: .oxygenSaturation, and: OxygenSaturationSessionSampleChunkDto.self)
+        try await self.syncWorkoutSamples(workoutExport, sessionId: sessionId, workout: workout, quantityType: .stepCount, and: StepCountSessionSampleChunkDto.self)
+        try await self.syncWorkoutCadenceSamples(workoutExport, sessionId: sessionId, workout: workout)
+        try await self.syncWorkoutDistanceSamples(workoutExport, sessionId: sessionId, workout: workout)
+        try await self.syncWorkoutLocationSamples(workoutExport, sessionId: sessionId, workout: workout)
+        try await self.syncWorkoutPowerSamples(workoutExport, sessionId: sessionId, workout: workout)
+        try await self.syncWorkoutSpeedSamples(workoutExport, sessionId: sessionId, workout: workout)
 
         try await context.sessionApi.completeSession(userId: context.userId, sessionId: sessionId)
         
@@ -211,8 +199,6 @@ internal class HKWorkoutSyncTask {
         if let data = try? NSKeyedArchiver.archivedData(withRootObject: anchor, requiringSecureCoding: true) {
             UserDefaults.standard.set(data, forKey: "\(SyncConstants.appleWorkoutAnchorUserDefaults)_\(context.userId)")
         }
-        
-        try await context.syncApi.updateAnchor(.workout, data: anchor)
     }
     
     private func sendWorkoutSamples<T : BaseSessionSampleChunkDto>(sampleEndpoint: ApiSessionSampleEndpoint, sessionId: Int, samples: [T]) async throws -> Void {
@@ -222,25 +208,18 @@ internal class HKWorkoutSyncTask {
 
         let segments = Int(ceil((Double(count) / Double(segmentSize))))
         
-        try await withThrowingTaskGroup(of: Void.self) { tasks in
-            for idx in 0...segments - 1 {
-                let start = (idx * segmentSize)
-                
-                var end = ((idx + 1) * segmentSize)
-                if end > count {
-                    end = samples.endIndex
-                }
-
-                let chunkId = idx + 1
-                let slice = samples[start..<end]
-
-                tasks.addTask {
-                    try? await self.context.sessionSampleChunkApi.delete(userId: self.context.userId, sessionId: sessionId, sampleEndpoint: sampleEndpoint, chunkId: chunkId)
-                    try await self.context.sessionSampleChunkApi.send(userId: self.context.userId, sessionId: sessionId, sampleEndpoint: sampleEndpoint, chunkId: chunkId, data: Array(slice))
-                }
-            }
+        for idx in 0...segments - 1 {
+            let start = (idx * segmentSize)
             
-            try await tasks.next()
+            var end = ((idx + 1) * segmentSize)
+            if end > count {
+                end = samples.endIndex
+            }
+
+            let chunkId = idx + 1
+            let slice = samples[start..<end]
+
+            try await self.context.sessionSampleChunkApi.send(userId: self.context.userId, sessionId: sessionId, sampleEndpoint: sampleEndpoint, chunkId: chunkId, data: Array(slice))
         }
     }
     

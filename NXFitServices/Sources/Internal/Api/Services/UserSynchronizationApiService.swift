@@ -15,16 +15,6 @@ package class UserSynchronizationApiService : BaseApiService, UserSynchronizatio
         super.init(configProvider, accessTokenProvider: accessTokenProvider)
     }
     
-    public func getAnchor(_ anchorType: ApiAnchorType) async throws -> HKQueryAnchor {
-        return try await ApiRequest
-            .get("user/synchronization/healthkit-anchors/\(anchorType.rawValue)")
-            .withBaseUrl(self.baseUrl)
-            .withBearer(self.accessToken)
-            .withRetry(.exponential())
-            .send()
-            .asResponse(modelProvider: {(dto: HKAnchorDto) -> HKQueryAnchor in dto.anchor })
-    }
-    
     public func listSessionSyncDetails() async throws -> Collection<SessionSyncModel> {
         return try await ApiRequest
             .get("user/synchronization/sessions")
@@ -43,17 +33,5 @@ package class UserSynchronizationApiService : BaseApiService, UserSynchronizatio
             .withRetry(.exponential())
             .send()
             .asResponse(modelProvider: SessionSyncModel.init)
-    }
-    
-    public func updateAnchor(_ anchorType: ApiAnchorType, data: HKQueryAnchor) async throws -> Void {
-        let model = HKAnchorDto(anchor: data)
-        
-        let _ = try await ApiRequest
-            .put("user/synchronization/healthkit-anchors/\(anchorType.rawValue)")
-            .withBaseUrl(self.baseUrl)
-            .withBearer(self.accessToken)
-            .withBody(body: model)
-            .withRetry(.exponential())
-            .send()
     }
 }

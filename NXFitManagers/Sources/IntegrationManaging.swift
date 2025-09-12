@@ -37,38 +37,20 @@ public protocol IntegrationManaging {
     /// - Returns: `Bool` if the URL can be handled but this client.
     func canHandleUrl(_ url: URL) -> Bool
     
-    /// Requests the consent URL for this User to begin the connection process.
+    /// Triggers the connect process for the integration
+    /// If the provided integration is local, the connectIntegrationCallback will not be called.
     /// - Throws: ``IntegrationError/alreadyConnected`` if the integration account and NXFit are already connected. See <doc:Errors> for further details.
-    /// - Throws: ``IntegrationError/invalidIntegrationType`` if the integration is a local type as denoted by ``IntegrationModel/isLocal``.  See <doc:Errors> for further details.
-    /// - Returns: Consent `URL` for the client browser to navigate to.
-    func connect(_ integration: IntegrationModel) async throws -> ConnectResultModel
-    
-    /// Triggers the connect
-    /// - Throws: ``IntegrationError/alreadyConnected`` if the integration account and NXFit are already connected. See <doc:Errors> for further details.
-    /// - Throws: ``IntegrationError/invalidIntegrationType`` if the integration is not a local type as denoted by ``IntegrationModel/isLocal``.  See <doc:Errors> for further details.
-    func connect(_ integration: IntegrationModel, connectLocalIntegrationCallback: () async throws -> Void) async throws -> Void
+    func connect(_ integration: IntegrationModel, connectIntegrationCallback: (URL) async throws -> Void) async throws -> Void
     
     /// Triggers the disconnect process from NXFit to the integration.
     /// - Throws: ``ApiError/server(statusCode:body:)`` with a 503 status code if the integration services are unavailable. See <doc:Errors>  for further details.
-    /// - Throws: ``IntegrationError/invalidIntegrationType`` if the integration is a local type as denoted by ``IntegrationModel/isLocal``.  See <doc:Errors> for further details.
     func disconnect(_ integration: IntegrationModel) async throws -> Void
-    
-    /// Triggers the disconnect process from NXFit to the local integration.
-    /// - Throws: ``ApiError/server(statusCode:body:)`` with a 503 status code if the integration services are unavailable. See <doc:Errors>  for further details.
-    /// - Throws: ``IntegrationError/invalidIntegrationType`` if the integration is not a local type as denoted by ``IntegrationModel/isLocal``.  See <doc:Errors> for further details.
-    func disconnect(_ integration: IntegrationModel, disconnectLocalIntegrationCallback: () async throws -> Void) async throws -> Void
-    
-    /// Retrieves an integration by identifier if it exists.
-    func getIntegration(_ identifier: String) async -> IntegrationModel?
     
     /// Retrieves an integration by identifier if it exists.
     func getIntegration(_ identifier: String) -> IntegrationModel?
     
     /// Combine publisher for current state of ``IntegrationModel`` for the given current user.
     func getIntegrations() -> AnyPublisher<[IntegrationModel], Never>
-    
-    /// Array of ``IntegrationModel`` for the given current user.
-    func getIntegrations() async -> [IntegrationModel]
     
     /// Handles the given callback `URL` denoting whether the connection from NXFit to the integration was successful
     /// An event is published ``IntegrationEvent/connected(integration:`` via ``IntegrationManager/events``.

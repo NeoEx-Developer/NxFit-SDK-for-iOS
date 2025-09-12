@@ -37,18 +37,31 @@ internal class HKHealthSyncTask<T : BaseHealthSampleDto> where T : HealthSampleC
             }
             
             var anchor = await self.getHealthSampleAnchor(for: quantityType)
-            var mappedSourcesAndSamples: Dictionary<SyncSource, [T]>?
+            var processing = true
             
-            (anchor, mappedSourcesAndSamples) = try await _HKQueries.getHealthSamples(self.logger, self.context.healthStore, for: quantityType, anchor: anchor)
-            
-            self.logger.debug("run<\(String(describing: T.self))>: \(mappedSourcesAndSamples?.count ?? 0) sources with samples found; background delivery: \(self.context.isBackgroundDelivery)")
-            
-            if let mappedSourcesAndSamples = mappedSourcesAndSamples, mappedSourcesAndSamples.count > 0 {
-                try await self.sendHealthSamples(sampleEndpoint: ApiSampleType.map(quantityType).endpoint, mappedSourcesAndSamples: mappedSourcesAndSamples)
-            }
-            
-            if let anchor = anchor {
-                try await self.saveHealthSampleAnchor(for: quantityType, anchor: anchor)
+            while(processing) {
+                var mappedSourcesAndSamples: Dictionary<SyncSource, [T]>?
+                
+                (anchor, mappedSourcesAndSamples) = try await _HKQueries.getHealthSamples(self.logger, self.context.healthStore, for: quantityType, anchor: anchor)
+                
+                self.logger.debug("run<\(String(describing: T.self))>: \(mappedSourcesAndSamples?.count ?? 0) sources with samples found; background delivery: \(self.context.isBackgroundDelivery)")
+                
+                if let mappedSourcesAndSamples = mappedSourcesAndSamples, mappedSourcesAndSamples.count > 0 {
+                    try await self.sendHealthSamples(sampleEndpoint: ApiSampleType.map(quantityType).endpoint, mappedSourcesAndSamples: mappedSourcesAndSamples)
+                    
+                    if let anchor = anchor {
+                        try await self.saveHealthSampleAnchor(for: quantityType, anchor: anchor)
+                    }
+                }
+                else {
+                    if let anchor = anchor {
+                        try await self.saveHealthSampleAnchor(for: quantityType, anchor: anchor)
+                    }
+                    
+                    self.logger.debug("run<\(String(describing: T.self))>: Sync task finished")
+                    
+                    processing = false
+                }
             }
             
             await context.incrementSamplesExported()
@@ -63,18 +76,11 @@ internal class HKHealthSyncTask<T : BaseHealthSampleDto> where T : HealthSampleC
             return anchor
         }
         
-        if let anchor = try? await self.context.syncApi.getAnchor(.mapFrom(quantityType)) {
-            await self.context.syncDataManager.setHealthSampleAnchor(for: quantityType, anchor: anchor)
-            
-            return anchor
-        }
-        
         return nil
     }
     
     private func saveHealthSampleAnchor(for quantityType: HKQuantityTypeIdentifier, anchor: HKQueryAnchor) async throws -> Void {
         await self.context.syncDataManager.setHealthSampleAnchor(for: quantityType, anchor: anchor)
-        try await self.context.syncApi.updateAnchor(.mapFrom(quantityType), data: anchor)
     }
     
     private func sendHealthSamples(sampleEndpoint: ApiSampleEndpoint, mappedSourcesAndSamples: Dictionary<SyncSource, [T]>) async throws -> Void {
@@ -86,21 +92,17 @@ internal class HKHealthSyncTask<T : BaseHealthSampleDto> where T : HealthSampleC
             if count > self.segmentSize {
                 let segments = Int(ceil((Double(count) / Double(self.segmentSize))))
                 
-                try await withThrowingTaskGroup(of: Void.self) { tasks in
-                    for idx in 0...segments - 1 {
-                        let start = (idx * self.segmentSize)
-                        
-                        var end = ((idx + 1) * self.segmentSize)
-                        if end > count {
-                            end = samples.endIndex
-                        }
-
-                        let slice = samples[start..<end]
-
-                        tasks.addTask { try await self.context.sampleApi.sendData(userId: self.context.userId, sampleEndpoint: sampleEndpoint, data: HealthSampleContainerDto(source: source, samples: Array(slice))) }
-                    }
+                for idx in 0...segments - 1 {
+                    let start = (idx * self.segmentSize)
                     
-                    try await tasks.next()
+                    var end = ((idx + 1) * self.segmentSize)
+                    if end > count {
+                        end = samples.endIndex
+                    }
+
+                    let slice = samples[start..<end]
+
+                    try await self.context.sampleApi.sendData(userId: self.context.userId, sampleEndpoint: sampleEndpoint, data: HealthSampleContainerDto(source: source, samples: Array(slice)))
                 }
             }
             else {

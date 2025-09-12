@@ -66,12 +66,10 @@ internal class IntegrationsDataManager {
     internal func addIntegrations(integrations: [IntegrationModel]) async -> Void {
         await self.backgroundCtx?.perform {
             for integration in integrations {
-                //let cache = NSEntityDescription.insertNewObject(forEntityName: "_Integration", into: self.backgroundCtx!) as! _Integration
                 let cache = _Integration(context: self.backgroundCtx!)
                 
                 cache.identifier = integration.identifier
                 cache.displayName = integration.displayName
-                cache.isLocal = integration.isLocal
                 cache.isConnected = integration.isConnected
                 cache.logoUrl = integration.logoUrl
                 cache.updatedDate = integration.updatedOn

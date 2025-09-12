@@ -37,18 +37,31 @@ internal class HKBloodPressureHealthSyncTask {
             }
 
             var anchor = await getHealthSampleAnchor()
-            let mappedSourcesAndSamples: Dictionary<SyncSource, [BloodPressureSampleDto]>?
+            var processing = true
             
-            (anchor, mappedSourcesAndSamples) = try await _HKQueries.getHealthBloodPressureSamples(self.logger, self.context.healthStore, anchor: anchor)
-            
-            self.logger.debug("run<BloodPressureSampleDto>: \(mappedSourcesAndSamples?.count ?? 0) sources with samples found; background delivery: \(self.context.isBackgroundDelivery)")
-            
-            if let mappedSourcesAndSamples = mappedSourcesAndSamples, mappedSourcesAndSamples.count > 0 {
-                try await self.sendHealthSamples(mappedSourcesAndSamples: mappedSourcesAndSamples)
-            }
-            
-            if let anchor = anchor {
-                try await self.saveHealthSampleAnchor(anchor: anchor)
+            while(processing) {
+                let mappedSourcesAndSamples: Dictionary<SyncSource, [BloodPressureSampleDto]>?
+                
+                (anchor, mappedSourcesAndSamples) = try await _HKQueries.getHealthBloodPressureSamples(self.logger, self.context.healthStore, anchor: anchor)
+                
+                self.logger.debug("run<BloodPressureSampleDto>: \(mappedSourcesAndSamples?.count ?? 0) sources with samples found; background delivery: \(self.context.isBackgroundDelivery)")
+                
+                if let mappedSourcesAndSamples = mappedSourcesAndSamples, mappedSourcesAndSamples.count > 0 {
+                    try await self.sendHealthSamples(mappedSourcesAndSamples: mappedSourcesAndSamples)
+                    
+                    if let anchor = anchor {
+                        try await self.saveHealthSampleAnchor(anchor: anchor)
+                    }
+                }
+                else {
+                    if let anchor = anchor {
+                        try await self.saveHealthSampleAnchor(anchor: anchor)
+                    }
+                    
+                    self.logger.debug("run<BloodPressureSampleDto>: Sync task finished")
+                    
+                    processing = false
+                }
             }
             
             await context.incrementSamplesExported()
@@ -64,19 +77,12 @@ internal class HKBloodPressureHealthSyncTask {
             return anchor
         }
         
-        if let anchor = try? await self.context.syncApi.getAnchor(.mapFrom(.bloodPressureSystolic)) {
-            await self.context.syncDataManager.setHealthSampleAnchor(for: .bloodPressureSystolic, anchor: anchor)
-            
-            return anchor
-        }
-        
         return nil
     }
     
     private func saveHealthSampleAnchor(anchor: HKQueryAnchor) async throws -> Void {
         //Blood pressure is a correlation type, there is no combined identifier so we use systolic for reference.
         await self.context.syncDataManager.setHealthSampleAnchor(for: .bloodPressureSystolic, anchor: anchor)
-        try await self.context.syncApi.updateAnchor(.mapFrom(.bloodPressureSystolic), data: anchor)
     }
     
     private func sendHealthSamples(mappedSourcesAndSamples: Dictionary<SyncSource, [BloodPressureSampleDto]>) async throws -> Void {
@@ -88,21 +94,17 @@ internal class HKBloodPressureHealthSyncTask {
             if count > self.segmentSize {
                 let segments = Int(ceil((Double(count) / Double(self.segmentSize))))
                 
-                try await withThrowingTaskGroup(of: Void.self) { tasks in
-                    for idx in 0...segments - 1 {
-                        let start = (idx * self.segmentSize)
-                        
-                        var end = ((idx + 1) * self.segmentSize)
-                        if end > count {
-                            end = samples.endIndex
-                        }
-
-                        let slice = samples[start..<end]
-
-                        tasks.addTask { try await self.context.sampleApi.sendData(userId: self.context.userId, sampleEndpoint: .bloodPressure, data: HealthSampleContainerDto(source: source, samples: Array(slice))) }
-                    }
+                for idx in 0...segments - 1 {
+                    let start = (idx * self.segmentSize)
                     
-                    try await tasks.next()
+                    var end = ((idx + 1) * self.segmentSize)
+                    if end > count {
+                        end = samples.endIndex
+                    }
+
+                    let slice = samples[start..<end]
+
+                    try await self.context.sampleApi.sendData(userId: self.context.userId, sampleEndpoint: .bloodPressure, data: HealthSampleContainerDto(source: source, samples: Array(slice)))
                 }
             }
             else {

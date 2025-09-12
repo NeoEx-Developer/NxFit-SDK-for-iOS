@@ -21,7 +21,7 @@ internal class NXFitManagerService : NXFitManager {
     private let userIntegrationsApi: UserIntegrationsApiService
     private let integrationManager: IntegrationManager
     
-    internal init(_ configProvider: ConfigurationProviding, _ authProvider: AuthProviding) {
+    internal init(_ configProvider: ConfigurationProviding, _ authProvider: AuthProviding, localIntegrationsClient: LocalIntegrationsClient? = nil) {
         self.logger = Logging.create(identifier: String(describing: NXFitManagerService.self))
         self.userId = authProvider.userId
         self.authProvider = authProvider
@@ -29,7 +29,7 @@ internal class NXFitManagerService : NXFitManager {
         
         self.authManager = SDKAuthManager(authProvider, userId: self.userId)
         self.userIntegrationsApi = UserIntegrationsApiService(configProvider, accessTokenProvider: authManager.getAccessToken)
-        self.integrationManager = IntegrationManager(configProvider, authManager: self.authManager, integrationsApi: self.userIntegrationsApi)
+        self.integrationManager = IntegrationManager(configProvider, authManager: self.authManager, integrationsClient: self.userIntegrationsApi, localIntegrationsClient: localIntegrationsClient)
     }
     
     public var integrations: IntegrationManaging { integrationManager }

@@ -13,8 +13,6 @@ extension IntegrationModel {
             identifier: dto.identifier,
             displayName: dto.displayName,
             logoUrl: dto.logoUrl,
-            isLocal: dto.isLocal,
-            isEnabled: dto.isEnabled,
             isConnected: dto.isConnected,
             updatedOn: dto.updatedOn
         )

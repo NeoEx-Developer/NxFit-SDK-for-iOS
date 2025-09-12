@@ -19,33 +19,49 @@ internal class IntegrationManager: NSObject, ObservableObject, IntegrationManagi
     private let authManager: SDKAuthManager
     private let configProvider: ConfigurationProviding
     private let logger: Logger
-    private let integrationsApi: UserIntegrationsClient
+    private let integrationsClient: UserIntegrationsClient
+    private let localIntegrationsClient: LocalIntegrationsClient?
     private let dataManager: IntegrationsDataManager
     private let integrations: CurrentValueSubject<[IntegrationModel], Never>
+    private let combinedIntegrations: CurrentValueSubject<[IntegrationModel], Never>
+    private let localIntegrations: CurrentValueSubject<[IntegrationModel], Never>
     private let integrationEventsPublisher: PassthroughSubject<IntegrationEvent, Never>
     private var connectingIntegration: IntegrationModel? = nil
+    private var integrationsSubscription: AnyCancellable? = nil
     private var userChangeSubscription: AnyCancellable? = nil
-    
-    internal init(_ configProvider: ConfigurationProviding, authManager: SDKAuthManager, integrationsApi: UserIntegrationsClient) {
+
+    internal init(_ configProvider: ConfigurationProviding, authManager: SDKAuthManager, integrationsClient: UserIntegrationsClient, localIntegrationsClient: LocalIntegrationsClient? = nil) {
         self.authManager = authManager
         self.configProvider = configProvider
         self.logger = Logging.create(identifier: String(describing: IntegrationManager.self))
         self.dataManager = IntegrationsDataManager(userId: authManager.getUserId())
-        self.integrationsApi = integrationsApi
+        self.integrationsClient = integrationsClient
+        self.localIntegrationsClient = localIntegrationsClient
         self.integrations = CurrentValueSubject([])
+        self.combinedIntegrations = CurrentValueSubject([])
+        self.localIntegrations = CurrentValueSubject([])
+
         self.integrationEventsPublisher = PassthroughSubject()
         
         super.init()
+        
+        self.integrationsSubscription = integrations
+            .combineLatest(localIntegrations)
+            .receive(on: RunLoop.main)
+            .sink { [weak self] (integrations, localIntegrations) in
+                self?.combinedIntegrations.send((integrations + localIntegrations).sorted(by: { $0.displayName <= $1.displayName }))
+            }
         
         self.userChangeSubscription = self.authManager
             .authState
             .receive(on: RunLoop.main)
             .sink { [weak self] (authState) in
                 if let self = self, case AuthState.authenticated(_) = authState {
+                    self.localIntegrations.send([])
                     self.integrations.send([])
                     
                     Task {
-                        await self.refresh()
+                        await self.refreshIntegrations()
                     }
                 }
             }
@@ -71,150 +87,63 @@ internal class IntegrationManager: NSObject, ObservableObject, IntegrationManagi
         return canHandle
     }
     
-    public func connect(_ integration: IntegrationModel) async throws -> ConnectResultModel {
+    public func connect(_ integration: IntegrationModel, connectIntegrationCallback: (URL) async throws -> Void) async throws -> Void {
         connectingIntegration = nil
         
         do {
-            guard let cachedIntegration = await dataManager.getIntegration(with: integration.identifier) else {
-                self.logger.debug("Cached integration not found; identifier: \(integration.identifier)")
-                throw IntegrationError.notFound
+            if
+                let localIntegration = self.localIntegrations.value.first { $0.identifier == integration.identifier },
+                let localIntegrationsClient = self.localIntegrationsClient
+            {
+                await localIntegrationsClient.connect()
+                await refreshLocalIntegrations()
+                await notifyStatus(integration.identifier, status: .connectSuccess)
             }
-            
-            if cachedIntegration.isLocal {
-                self.logger.debug("Handling local integration connect; identifier: \(integration.identifier)")
-                throw IntegrationError.invalidIntegrationType
-            }
-            
-            let result = try await self.integrationsApi.connect(identifier: integration.identifier, callbackUrl: redirectUrl)
-            
-            guard let result = result else {
-                //A blank response from the server indicates a 204 for a local integration - this function is restricted to remote integrations.
-                throw IntegrationError.connectFailed
-            }
-            
-            connectingIntegration = integration
+            else {
+                let result = try await self.integrationsClient.connect(identifier: integration.identifier, callbackUrl: redirectUrl)
                 
-            return result
+                try await connectIntegrationCallback(result.authorizeUrl)
+            }
         }
         catch ApiError.conflict {
             throw IntegrationError.alreadyConnected
         }
         catch {
             self.logger.error("Integration connect failed; identifier: \(integration.identifier), error: \(error.localizedDescription)")
-
-            throw IntegrationError.connectFailed
-        }
-    }
-    
-    public func connect(_ integration: IntegrationModel, connectLocalIntegrationCallback: () async throws -> Void) async throws -> Void {
-        connectingIntegration = nil
-        
-        do {
-            guard let cachedIntegration = await dataManager.getIntegration(with: integration.identifier) else {
-                self.logger.debug("Cached integration not found; identifier: \(integration.identifier)")
-                throw IntegrationError.notFound
-            }
-            
-            if !cachedIntegration.isLocal {
-                self.logger.debug("Handling local integration connect; identifier: \(integration.identifier)")
-                throw IntegrationError.invalidIntegrationType
-            }
-            
-            try await connectLocalIntegrationCallback()
-            
-            let _ = try await self.integrationsApi.connect(identifier: integration.identifier, callbackUrl: redirectUrl)
-        }
-        catch ApiError.conflict {
-            throw IntegrationError.alreadyConnected
-        }
-        catch {
-            self.logger.error("Integration connect failed; identifier: \(integration.identifier), error: \(error.localizedDescription)")
-
+            await notifyStatus(integration.identifier, status: .connectFailed)
             throw IntegrationError.connectFailed
         }
     }
 
     public func disconnect(_ integration: IntegrationModel) async throws -> Void {
         do {
-            guard let cachedIntegration = await dataManager.getIntegration(with: integration.identifier) else {
-                self.logger.debug("Cached integration not found; identifier: \(integration.identifier)")
-                throw IntegrationError.notFound
+            if
+                let localIntegration = self.localIntegrations.value.first { $0.identifier == integration.identifier },
+                let localIntegrationsClient = self.localIntegrationsClient
+            {
+                await localIntegrationsClient.disconnect()
+                await refreshLocalIntegrations()
+                await notifyStatus(integration.identifier, status: .disconnectSuccess)
             }
-
-            if cachedIntegration.isLocal {
-                self.logger.debug("Local integration disconnect; identifier: \(integration.identifier)")
-                throw IntegrationError.invalidIntegrationType
+            else {
+                try await self.integrationsClient.disconnect(identifier: integration.identifier)
+                await updateAndPublish(integration.identifier, isConnected: false)
+                await notifyStatus(integration.identifier, status: .disconnectSuccess)
             }
-            
-            if !cachedIntegration.isConnected {
-                self.logger.debug("Integration already disconnected; identifier: \(integration.identifier)")
-                return
-            }
-            
-            try await self.integrationsApi.disconnect(identifier: integration.identifier)
-            
-            await updateAndPublish(cachedIntegration.identifier, isConnected: false)
         }
         catch {
             self.logger.error("Integration disconnect failed; identifier: \(integration.identifier), error: \(error.localizedDescription)")
-            
+            await notifyStatus(integration.identifier, status: .disconnectSuccess)
             throw IntegrationError.disconnectFailed
         }
-    }
-    
-    public func disconnect(_ integration: IntegrationModel, disconnectLocalIntegrationCallback: () async throws -> Void) async throws -> Void {
-        do {
-            guard let cachedIntegration = await dataManager.getIntegration(with: integration.identifier) else {
-                self.logger.debug("Cached integration not found; identifier: \(integration.identifier)")
-                throw IntegrationError.notFound
-            }
-
-            if !cachedIntegration.isLocal {
-                self.logger.debug("Remote integration disconnect; identifier: \(integration.identifier)")
-                throw IntegrationError.invalidIntegrationType
-            }
-            
-            try await disconnectLocalIntegrationCallback()
-            
-            if !cachedIntegration.isConnected {
-                self.logger.debug("Integration already disconnected; identifier: \(integration.identifier)")
-                return
-            }
-
-            try await self.integrationsApi.disconnect(identifier: integration.identifier)
-            
-            await updateAndPublish(cachedIntegration.identifier, isConnected: false)
-        }
-        catch {
-            self.logger.error("Integration disconnect failed; identifier: \(integration.identifier), error: \(error.localizedDescription)")
-            
-            throw IntegrationError.disconnectFailed
-        }
-    }
-    
-    public func getIntegration(_ identifier: String) async -> IntegrationModel? {
-        return await self.dataManager.getIntegration(with: identifier)
     }
     
     public func getIntegration(_ identifier: String) -> IntegrationModel? {
-        return self.integrations.value.first(where: { $0.identifier == identifier })
+        return self.combinedIntegrations.value.first(where: { $0.identifier == identifier })
     }
 
     public func getIntegrations() -> AnyPublisher<[IntegrationModel], Never> {
-        return self.integrations.eraseToAnyPublisher()
-    }
-    
-    public func getIntegrations() async -> [IntegrationModel] {
-        if let integrations = try? await self.integrationsApi.getIntegrations() {
-            await dataManager.clearIntegrations()
-            await dataManager.addIntegrations(integrations: integrations.results)
-            
-            await publish(integrations.results)
-            
-            return integrations.results
-        }
-        
-        return []
+        return self.combinedIntegrations.eraseToAnyPublisher()
     }
     
     public func handleUrl(_ url: URL) async throws -> Void {
@@ -232,13 +161,13 @@ internal class IntegrationManager: NSObject, ObservableObject, IntegrationManagi
                     status = IntegrationConnectionStatus.connectSuccess
                 }
                 
-                await notifyStatus(userIntegration, status: status)
+                await notifyStatus(userIntegration.identifier, status: status)
             }
         }
     }
     
     internal func initialize() async -> Void {
-        await refresh()
+        await refreshIntegrations()
     }
     
     public func isConnected(_ identifier: String) -> Bool {
@@ -246,20 +175,31 @@ internal class IntegrationManager: NSObject, ObservableObject, IntegrationManagi
     }
     
     public func refreshIntegrations() async -> Void {
-        await refresh()
+        await refreshRemoteIntegrations()
+        await refreshLocalIntegrations()
     }
     
     /// Triggered if the browser is closed.
     public func safariViewControllerDidFinish(_ controller: SFSafariViewController) {
         Task {
             if let connectingIntegration = connectingIntegration {
-                await notifyStatus(connectingIntegration, status: .connectFailed)
+                await notifyStatus(connectingIntegration.identifier, status: .connectFailed)
             }
         }
     }
     
     internal func purgeCache() throws -> Void {
         try dataManager.purgeAllCachedData()
+    }
+    
+    private func buildLocalIntegration(isConnected: Bool = false) -> IntegrationModel {
+        return IntegrationModel(
+            identifier: "apple",
+            displayName: "Apple Health",
+            logoUrl: URL(string: "https://stnxfitcancshared.blob.core.windows.net/public/integrations/apple_health.png")!,
+            isConnected: isConnected,
+            updatedOn: Date()
+        )
     }
     
     private func parseUrl(_ url: URL) -> (identifier: String, result: Bool)? {
@@ -274,52 +214,60 @@ internal class IntegrationManager: NSObject, ObservableObject, IntegrationManagi
         return nil
     }
     
-    private func refresh() async -> Void {        
+    private func refreshLocalIntegrations() async -> Void {
+        if let localIntegrationsClient = self.localIntegrationsClient {
+            let connected = localIntegrationsClient.isConnected()
+            let integration = buildLocalIntegration(isConnected: connected)
+            
+            await MainActor.run {
+                self.localIntegrations.send([integration])
+            }
+        }
+    }
+    
+    private func refreshRemoteIntegrations() async -> Void {
         if let integrations = await dataManager.getIntegrations() {
-            await publish(integrations)
+            await MainActor.run {
+                self.integrations.send(integrations)
+            }
         }
         
-        if let integrations = try? await self.integrationsApi.getIntegrations() {
+        if let integrations = try? await self.integrationsClient.getIntegrations() {
             await dataManager.clearIntegrations()
             await dataManager.addIntegrations(integrations: integrations.results)
 
-            await publish(integrations.results)
+            await MainActor.run {
+                self.integrations.send(integrations.results)
+            }
         }
     }
     
     private func updateAndPublish(_ identifier: String, isConnected: Bool) async -> Void {
         await dataManager.setIntegrationConnectionState(for: identifier, isConnected: isConnected)
         
-        if let integrations = await dataManager.getIntegrations() {
-            await publish(integrations)
-        }
-        else {
-            await refresh()
-        }
-    }
-    
-    private func publish(_ integrations: [IntegrationModel]) async -> Void {
+        let integrations = await dataManager.getIntegrations() ?? []
+        
         await MainActor.run {
-            self.integrations.send(integrations.sorted(by: { $0.identifier <= $1.identifier }))
+            self.integrations.send(integrations)
         }
     }
     
     @MainActor
-    internal func notifyStatus(_ integration: IntegrationModel, status: IntegrationConnectionStatus) async -> Void {
-        self.logger.debug("notifyStatus: Notifying for integration status change: integration: \(String(describing: integration)), status: \(String(describing: status))")
+    internal func notifyStatus(_ integrationIdentifier: String, status: IntegrationConnectionStatus) async -> Void {
+        self.logger.debug("notifyStatus: Notifying for integration status change: integration: \(integrationIdentifier), status: \(String(describing: status))")
         
         switch status {
             case .connectSuccess:
-                self.integrationEventsPublisher.send(.connected(integration: integration))
+                self.integrationEventsPublisher.send(.connected(integrationIdentifier))
                 break
             case .connectFailed:
-            self.integrationEventsPublisher.send(.connectionFailed(integration: integration))
+            self.integrationEventsPublisher.send(.connectionFailed(integrationIdentifier))
                 break
             case .disconnectSuccess:
-                self.integrationEventsPublisher.send(.disconnected(integration: integration))
+                self.integrationEventsPublisher.send(.disconnected(integrationIdentifier))
                 break
             case .disconnectFailed:
-                self.integrationEventsPublisher.send(.disconnectFailed(integration: integration))
+                self.integrationEventsPublisher.send(.disconnectFailed(integrationIdentifier))
                 break
         }
     }

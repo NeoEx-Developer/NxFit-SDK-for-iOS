@@ -49,7 +49,8 @@ internal class HealthKitManager {
                         
                         case .ready:
                             Task {
-                                await self.sync()
+                                await self.syncHealth()
+                                await self.syncWorkouts()
                             }
                         
                         default:
@@ -140,7 +141,7 @@ internal class HealthKitManager {
         self.logger.info("resetAndRetry: Sync complete")
     }
     
-    public func sync() async -> Void {
+    public func syncHealth() async -> Void {
         guard self.syncStatusPublisher.value.isReady() else {
             self.logger.debug("sync: HealthKit is not yet ready to sync")
             return
@@ -151,19 +152,37 @@ internal class HealthKitManager {
             return
         }
 
-        self.logger.info("sync: Syncing")
+        self.logger.info("sync: Syncing health samples")
         
         let context = HKSyncContext(self.configProvider, healthStore: self.healthStoreClient.store, userId: self.authManager.getUserId(), accessToken: accessToken, publisher: self.syncStatusPublisher)
 
         await self.setState(to: .processing(context.stats))
         
-        self.logger.debug("sync: Syncing health samples")
         await self.syncHealth(context)
-        self.logger.debug("sync: Syncing health samples complete")
         
-        self.logger.debug("sync: Syncing workouts")
+        await setState(to: .complete)
+        
+        self.logger.info("sync: Sync health samples complete")
+    }
+    
+    public func syncWorkouts() async -> Void {
+        guard self.syncStatusPublisher.value.isReady() else {
+            self.logger.debug("sync: HealthKit is not yet ready to sync")
+            return
+        }
+        
+        guard self.authManager.isAuthenticated(), let accessToken = self.authManager.getAccessToken() else {
+            self.logger.error("sync: User not authenticated")
+            return
+        }
+
+        self.logger.info("sync: Syncing workouts")
+        
+        let context = HKSyncContext(self.configProvider, healthStore: self.healthStoreClient.store, userId: self.authManager.getUserId(), accessToken: accessToken, publisher: self.syncStatusPublisher)
+
+        await self.setState(to: .processing(context.stats))
+
         await self.syncWorkouts(context)
-        self.logger.debug("sync: Syncing workouts complete")
         
         let failures = await context.syncDataManager.getTotalFailedWorkoutExports()
         
@@ -175,7 +194,7 @@ internal class HealthKitManager {
             await setState(to: .complete)
         }
         
-        self.logger.info("sync: Sync complete")
+        self.logger.info("sync: Sync workouts complete")
     }
     
     public var syncStatus: AnyPublisher<HKSyncState, Never> {
@@ -252,20 +271,18 @@ internal class HealthKitManager {
     }
 
     private func syncHealth(_ context: HKSyncContext) async -> Void {
-        await withTaskGroup(of: Void.self) { tasks in
-            tasks.addTask { await HKBloodPressureHealthSyncTask(context).run() }
-            tasks.addTask { await HKHealthSyncTask<BodyFatSampleDto>(context, quantityType: .bodyFatPercentage).run() }
-            tasks.addTask { await HKHealthSyncTask<BodyMassIndexSampleDto>(context, quantityType: .bodyMassIndex).run() }
-            tasks.addTask { await HKHealthSyncTask<BodyMassSampleDto>(context, quantityType: .bodyMass).run() }
-            tasks.addTask { await HKHealthSyncTask<BodyTemperatureSampleDto>(context, quantityType: .bodyTemperature).run() }
-            tasks.addTask { await HKHealthSyncTask<HeartRateSampleDto>(context, quantityType: .heartRate).run() }
-            tasks.addTask { await HKHealthSyncTask<HeartRateVariabilitySampleDto>(context, quantityType: .heartRateVariabilitySDNN).run() }
-            tasks.addTask { await HKHealthSyncTask<HeightSampleDto>(context, quantityType: .height).run() }
-            tasks.addTask { await HKHealthSyncTask<OxygenSaturationSampleDto>(context, quantityType: .oxygenSaturation).run() }
-            tasks.addTask { await HKHealthSyncTask<RespiratoryRateSampleDto>(context, quantityType: .respiratoryRate).run() }
-            tasks.addTask { await HKHealthSyncTask<HeartRateSampleDto>(context, quantityType: .restingHeartRate).run() }
-            tasks.addTask { await HKHealthSyncTask<VO2MaxSampleDto>(context, quantityType: .vo2Max).run() }
-        }
+        await HKBloodPressureHealthSyncTask(context).run()
+        await HKHealthSyncTask<BodyFatSampleDto>(context, quantityType: .bodyFatPercentage).run()
+        await HKHealthSyncTask<BodyMassIndexSampleDto>(context, quantityType: .bodyMassIndex).run()
+        await HKHealthSyncTask<BodyMassSampleDto>(context, quantityType: .bodyMass).run()
+        await HKHealthSyncTask<BodyTemperatureSampleDto>(context, quantityType: .bodyTemperature).run()
+        await HKHealthSyncTask<HeartRateSampleDto>(context, quantityType: .heartRate).run()
+        await HKHealthSyncTask<HeartRateVariabilitySampleDto>(context, quantityType: .heartRateVariabilitySDNN).run()
+        await HKHealthSyncTask<HeightSampleDto>(context, quantityType: .height).run()
+        await HKHealthSyncTask<OxygenSaturationSampleDto>(context, quantityType: .oxygenSaturation).run()
+        await HKHealthSyncTask<RespiratoryRateSampleDto>(context, quantityType: .respiratoryRate).run()
+        await HKHealthSyncTask<HeartRateSampleDto>(context, quantityType: .restingHeartRate).run()
+        await HKHealthSyncTask<VO2MaxSampleDto>(context, quantityType: .vo2Max).run()
     }
     
     private func syncWorkouts(_ context: HKSyncContext) async -> Void {

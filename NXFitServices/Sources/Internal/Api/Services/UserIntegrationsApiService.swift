@@ -14,7 +14,7 @@ package class UserIntegrationsApiService : BaseApiService, UserIntegrationsClien
         super.init(configProvider, accessTokenProvider: accessTokenProvider)
     }
     
-    public func connect(identifier: String, callbackUrl: String?) async throws -> ConnectResultModel? {
+    public func connect(identifier: String, callbackUrl: String?) async throws -> ConnectResultModel {
         return try await ApiRequest
             .put("user/integrations/\(identifier)")
             .withBaseUrl(self.baseUrl)
@@ -22,13 +22,7 @@ package class UserIntegrationsApiService : BaseApiService, UserIntegrationsClien
             .withRetry(.exponential())
             .setQueryParameter("redirectUri", value: callbackUrl)
             .send()
-            .asOptionalResponse(modelProvider: { (dto: ConnectIntegrationDto?) -> ConnectResultModel? in
-                guard let dto = dto else {
-                    return nil
-                }
-                
-                return ConnectResultModel(authorizeUrl: dto.authorizeUrl)
-            })
+            .asResponse(modelProvider: ConnectResultModel.init(dto:))
     }
     
     public func disconnect(identifier: String) async throws -> Void {

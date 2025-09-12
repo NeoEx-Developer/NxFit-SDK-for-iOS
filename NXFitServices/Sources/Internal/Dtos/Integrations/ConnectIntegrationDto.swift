@@ -9,4 +9,8 @@ import Foundation
 
 internal struct ConnectIntegrationDto : Decodable {
     internal let authorizeUrl: URL
+    
+    internal init(authorizeUrl: URL) {
+        self.authorizeUrl = authorizeUrl
+    }
 }

@@ -8,6 +8,7 @@
 import Foundation
 import NXFitAuth
 import NXFitConfig
+import NXFitServices
 
 ///  Factory for the NXFit Manager SDK on iOS.
 ///
@@ -24,8 +25,9 @@ public class NXFitManagerFactory {
     /// - Parameters:
     ///   - configProvider: Provides the required configuration to the SDK e.g. API base URL.
     ///   - authProvider: Provides the relevant auth details to the SDK e.g. auth status & access token.
+    ///   - localIntegrationsClient: Optional client which provides local integration management.
     /// - Returns: A configured instance of the SDK.
-    public static func build(_ configProvider: ConfigurationProviding, _ authProvider: AuthProviding) -> NXFitManager {
-        return NXFitManagerService(configProvider, authProvider)
+    public static func build(_ configProvider: ConfigurationProviding, _ authProvider: AuthProviding, localIntegrationsClient: LocalIntegrationsClient? = nil) -> NXFitManager {
+        return NXFitManagerService(configProvider, authProvider, localIntegrationsClient: localIntegrationsClient)
     }
 }
