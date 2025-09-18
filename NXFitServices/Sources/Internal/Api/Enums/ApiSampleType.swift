@@ -8,18 +8,19 @@
 import Foundation
 import HealthKit
 
-package enum ApiSampleType : Int, Codable {
-    case other = 0,
-         bloodPressure = 20,
-         bodyFatPercentage = 2,
-         bodyMassIndex = 3,
-         bodyMass = 4,
-         bodyTemperature = 5,
-         heartRate = 8,
-         heartRateVariabilitySDNN = 9,
-         height = 10,
-         oxygenSaturation = 13,
-         respiratoryRate = 14,
-         restingHeartRate = 15,
-         vo2Max = 11
+package enum ApiSampleType {
+    case other,
+         bloodPressure,
+         bodyFatPercentage,
+         bodyMassIndex,
+         bodyMass,
+         bodyTemperature,
+         heartRate,
+         heartRateVariabilitySDNN,
+         height,
+         oxygenSaturation,
+         respiratoryRate,
+         restingHeartRate,
+         stepCount,
+         vo2Max
 }

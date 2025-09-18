@@ -12,7 +12,7 @@ import NXFitConfig
 import NXFitServices
 
 internal class HKSyncContext {
-    private let totalSamples = 12 //Only 12 as systolic & diastolic blood pressure are combined
+    private let totalSamples = 13 //Only 13 as systolic & diastolic blood pressure are combined
     internal let userId: Int
     internal let apiVersion: String
     internal let accessToken: String

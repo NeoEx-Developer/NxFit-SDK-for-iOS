@@ -102,6 +102,10 @@ internal extension SyncSource {
         "iPhone17,3": ("iPhone 16", "iOS"),
         "iPhone17,4": ("iPhone 16 Plus", "iOS"),
         "iPhone17,5": ("iPhone 16e", "iOS"),
+        "iPhone18,1": ("iPhone 17 Pro", "iOS"),
+        "iPhone18,2": ("iPhone 17 Pro Max", "iOS"),
+        "iPhone18,3": ("iPhone 17", "iOS"),
+        "iPhone18,4": ("iPhone Air", "iOS"),
         "iPod1,1": ("iPod 1st Gen", "iOS"),
         "iPod2,1": ("iPod 2nd Gen", "iOS"),
         "iPod3,1": ("iPod 3rd Gen", "iOS"),
@@ -250,6 +254,15 @@ internal extension SyncSource {
         "Watch7,8": ("pple Watch Series 10", "watchOS"),
         "Watch7,9": ("Apple Watch Series 10", "watchOS"),
         "Watch7,10": ("Apple Watch Series 10", "watchOS"),
-        "Watch7,11": ("Apple Watch Series 10", "watchOS")
+        "Watch7,11": ("Apple Watch Series 10", "watchOS"),
+        "Watch7,12": ("Apple Watch Ultra 3", "watchOS"),
+        "Watch7,13": ("Apple Watch SE 3", "watchOS"),
+        "Watch7,14": ("Apple Watch SE 3", "watchOS"),
+        "Watch7,15": ("Apple Watch SE 3", "watchOS"),
+        "Watch7,16": ("Apple Watch SE 3", "watchOS"),
+        "Watch7,17": ("Apple Watch Series 11", "watchOS"),
+        "Watch7,18": ("Apple Watch Series 11", "watchOS"),
+        "Watch7,19": ("Apple Watch Series 11", "watchOS"),
+        "Watch7,20": ("Apple Watch Series 11", "watchOS"),
     ]
 }

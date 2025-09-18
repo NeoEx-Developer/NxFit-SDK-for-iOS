@@ -35,6 +35,8 @@ extension ApiSampleType {
                 return .respiratoryRate
             case .restingHeartRate:
                 return .restingHeartRate
+            case .stepCount:
+                return .stepCount
             case .vo2Max:
                 return .vo2Max
             default:
@@ -66,6 +68,8 @@ extension ApiSampleType {
                 return ApiSampleEndpoint.restingHeartRate
             case .respiratoryRate:
                 return ApiSampleEndpoint.respiratoryRate
+            case .stepCount:
+                return ApiSampleEndpoint.stepCount
             case .vo2Max:
                 return ApiSampleEndpoint.vo2Max
             default:

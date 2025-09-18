@@ -51,6 +51,7 @@ public class NXFitSyncBackground {
         _HKQueries.setupHealthBackgroundDelivery(store, context, for: .oxygenSaturation, and: OxygenSaturationSampleDto.self)
         _HKQueries.setupHealthBackgroundDelivery(store, context, for: .respiratoryRate, and: RespiratoryRateSampleDto.self)
         _HKQueries.setupHealthBackgroundDelivery(store, context, for: .restingHeartRate, and: HeartRateSampleDto.self)
+        _HKQueries.setupHealthBackgroundDelivery(store, context, for: .stepCount, and: StepCountSampleDto.self)
         _HKQueries.setupHealthBackgroundDelivery(store, context, for: .vo2Max, and: VO2MaxSampleDto.self)
         
         logger.info("enableHealthKitBackgroundDelivery: background delivery enabled")
@@ -72,6 +73,7 @@ public class NXFitSyncBackground {
         _HKQueries.stopHealthBackgroundDelivery(store, for: .oxygenSaturation)
         _HKQueries.stopHealthBackgroundDelivery(store, for: .respiratoryRate)
         _HKQueries.stopHealthBackgroundDelivery(store, for: .restingHeartRate)
+        _HKQueries.stopHealthBackgroundDelivery(store, for: .stepCount)
         _HKQueries.stopHealthBackgroundDelivery(store, for: .vo2Max)
         
         logger.info("disableHealthkitBackgroundDelivery: background delivery disabled")

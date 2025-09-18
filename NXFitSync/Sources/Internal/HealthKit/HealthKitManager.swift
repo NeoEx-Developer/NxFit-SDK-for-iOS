@@ -282,29 +282,12 @@ internal class HealthKitManager {
         await HKHealthSyncTask<OxygenSaturationSampleDto>(context, quantityType: .oxygenSaturation).run()
         await HKHealthSyncTask<RespiratoryRateSampleDto>(context, quantityType: .respiratoryRate).run()
         await HKHealthSyncTask<HeartRateSampleDto>(context, quantityType: .restingHeartRate).run()
+        await HKHealthSyncTask<StepCountSampleDto>(context, quantityType: .stepCount).run()
         await HKHealthSyncTask<VO2MaxSampleDto>(context, quantityType: .vo2Max).run()
     }
     
     private func syncWorkouts(_ context: HKSyncContext) async -> Void {
         await HKWorkoutSyncTask(context).run()
-    }
-    
-    private var healthSamples: [HKQuantityTypeIdentifier] {
-        return [
-            .bloodPressureSystolic,
-            .bloodPressureDiastolic,
-            .bodyFatPercentage,
-            .bodyMassIndex,
-            .bodyMass,
-            .bodyTemperature,
-            .heartRate,
-            .heartRateVariabilitySDNN,
-            .height,
-            .oxygenSaturation,
-            .respiratoryRate,
-            .restingHeartRate,
-            .vo2Max
-        ]
     }
     
     internal enum InitializeState {
