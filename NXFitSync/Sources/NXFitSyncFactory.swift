@@ -8,6 +8,7 @@
 import Foundation
 import NXFitAuth
 import NXFitConfig
+import NXFitServices
 
 ///  Factory for the NXFit Sync SDK on iOS.
 ///
@@ -29,6 +30,8 @@ public class NXFitSyncFactory {
     ///   - authProvider: Provides the relevant auth details to the SDK e.g. auth status & access token.
     /// - Returns: A configured instance of the SDK.
     public static func build(_ configProvider: ConfigurationProviding, _ authProvider: AuthProviding) -> NXFitSync {
+        ApiLogger.setLogLevel(configProvider.configuration.httpLogLevel)
+        
         return NXFitSyncService(configProvider, authProvider)
     }
 }

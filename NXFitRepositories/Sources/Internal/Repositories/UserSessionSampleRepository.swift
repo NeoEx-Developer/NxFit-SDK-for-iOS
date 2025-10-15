@@ -29,14 +29,22 @@ internal class UserSessionSampleRepository : UserSessionSampleRepositoryClient {
             let cache = await self.cache.getUserSessionEnergyBurnedSampleCache(sessionId: sessionId, energyType: UserSessionEnergyBurnedSampleCache.active)
             
             if let cache = cache {
-                subject.send(cache.loadModels())
+                let models = cache.asModels()
+                
+                await MainActor.run {
+                    subject.send(models)
+                }
             }
 
             if let samples = await getActiveEnergySamples(userId: userId, sessionId: sessionId, lastModified: cache?.timeStamp) {
-                subject.send(samples)
+                await MainActor.run {
+                    subject.send(samples)
+                }
             }
             
-            subject.send(completion: .finished)
+            await MainActor.run {
+                subject.send(completion: .finished)
+            }
         }
         
         return subject.eraseToAnyPublisher()
@@ -49,14 +57,22 @@ internal class UserSessionSampleRepository : UserSessionSampleRepositoryClient {
             let cache = await self.cache.getUserSessionEnergyBurnedSampleCache(sessionId: sessionId, energyType: UserSessionEnergyBurnedSampleCache.basal)
             
             if let cache = cache {
-                subject.send(cache.loadModels())
+                let models = cache.asModels()
+                
+                await MainActor.run {
+                    subject.send(models)
+                }
             }
 
             if let samples = await getBasalEnergySamples(userId: userId, sessionId: sessionId, lastModified: cache?.timeStamp) {
-                subject.send(samples)
+                await MainActor.run {
+                    subject.send(samples)
+                }
             }
             
-            subject.send(completion: .finished)
+            await MainActor.run {
+                subject.send(completion: .finished)
+            }
         }
         
         return subject.eraseToAnyPublisher()
@@ -69,14 +85,22 @@ internal class UserSessionSampleRepository : UserSessionSampleRepositoryClient {
             let cache = await self.cache.getUserSessionCadenceSampleCache(sessionId: sessionId)
             
             if let cache = cache {
-                subject.send(cache.loadModels())
+                let models = cache.asModels()
+                
+                await MainActor.run {
+                    subject.send(models)
+                }
             }
 
             if let samples = await getCadenceSamples(userId: userId, sessionId: sessionId, lastModified: cache?.timeStamp) {
-                subject.send(samples)
+                await MainActor.run {
+                    subject.send(samples)
+                }
             }
             
-            subject.send(completion: .finished)
+            await MainActor.run {
+                subject.send(completion: .finished)
+            }
         }
         
         return subject.eraseToAnyPublisher()
@@ -89,14 +113,22 @@ internal class UserSessionSampleRepository : UserSessionSampleRepositoryClient {
             let cache = await self.cache.getUserSessionDistanceSampleCache(sessionId: sessionId)
             
             if let cache = cache {
-                subject.send(cache.loadModels())
+                let models = cache.asModels()
+                
+                await MainActor.run {
+                    subject.send(models)
+                }
             }
 
             if let samples = await getDistanceSamples(userId: userId, sessionId: sessionId, lastModified: cache?.timeStamp) {
-                subject.send(samples)
+                await MainActor.run {
+                    subject.send(samples)
+                }
             }
             
-            subject.send(completion: .finished)
+            await MainActor.run {
+                subject.send(completion: .finished)
+            }
         }
         
         return subject.eraseToAnyPublisher()
@@ -109,14 +141,22 @@ internal class UserSessionSampleRepository : UserSessionSampleRepositoryClient {
             let cache = await self.cache.getUserSessionExerciseTimeSampleCache(sessionId: sessionId)
             
             if let cache = cache {
-                subject.send(cache.loadModels())
+                let models = cache.asModels()
+                
+                await MainActor.run {
+                    subject.send(models)
+                }
             }
 
             if let samples = await getExerciseTimeSamples(userId: userId, sessionId: sessionId, lastModified: cache?.timeStamp) {
-                subject.send(samples)
+                await MainActor.run {
+                    subject.send(samples)
+                }
             }
             
-            subject.send(completion: .finished)
+            await MainActor.run {
+                subject.send(completion: .finished)
+            }
         }
         
         return subject.eraseToAnyPublisher()
@@ -129,14 +169,22 @@ internal class UserSessionSampleRepository : UserSessionSampleRepositoryClient {
             let cache = await self.cache.getUserSessionHeartRateSampleCache(sessionId: sessionId)
             
             if let cache = cache {
-                subject.send(cache.loadModels())
+                let models = cache.asModels()
+                
+                await MainActor.run {
+                    subject.send(models)
+                }
             }
 
             if let samples = await self.getHeartRateSamples(userId: userId, sessionId: sessionId, lastModified: cache?.timeStamp) {
-                subject.send(samples)
+                await MainActor.run {
+                    subject.send(samples)
+                }
             }
             
-            subject.send(completion: .finished)
+            await MainActor.run {
+                subject.send(completion: .finished)
+            }
         }
         
         return subject.eraseToAnyPublisher()
@@ -149,14 +197,22 @@ internal class UserSessionSampleRepository : UserSessionSampleRepositoryClient {
             let cache = await self.cache.getUserSessionHeartRateSummaryCache(sessionId: sessionId, intervalSeconds: intervalInSeconds)
             
             if let cache = cache {
-                subject.send(cache.loadModels())
+                let models = cache.asModels()
+                
+                await MainActor.run {
+                    subject.send(models)
+                }
             }
 
             if let summaries = await getHeartRateZonesSummary(userId: userId, sessionId: sessionId, interval: intervalInSeconds, lastModified: cache?.timeStamp) {
-                subject.send(summaries)
+                await MainActor.run {
+                    subject.send(summaries)
+                }
             }
             
-            subject.send(completion: .finished)
+            await MainActor.run {
+                subject.send(completion: .finished)
+            }
         }
         
         return subject.eraseToAnyPublisher()
@@ -169,14 +225,22 @@ internal class UserSessionSampleRepository : UserSessionSampleRepositoryClient {
             let cache = await self.cache.getUserSessionHRVSampleCache(sessionId: sessionId)
             
             if let cache = cache {
-                subject.send(cache.loadModels())
+                let models = cache.asModels()
+                
+                await MainActor.run {
+                    subject.send(models)
+                }
             }
 
             if let samples = await getHeartRateVariabilitySamples(userId: userId, sessionId: sessionId, lastModified: cache?.timeStamp) {
-                subject.send(samples)
+                await MainActor.run {
+                    subject.send(samples)
+                }
             }
             
-            subject.send(completion: .finished)
+            await MainActor.run {
+                subject.send(completion: .finished)
+            }
         }
         
         return subject.eraseToAnyPublisher()
@@ -185,18 +249,26 @@ internal class UserSessionSampleRepository : UserSessionSampleRepositoryClient {
     public func getLocationSamples(userId: Int, sessionId: Int) -> AnyPublisher<Collection<LocationSessionSampleModel>, Never> {
         let subject = CurrentValueSubject<Collection<LocationSessionSampleModel>, Never>(Collection(results: []))
         
-        Task {
+        Task(priority: .userInitiated) {
             let cache = await self.cache.getUserSessionLocationSampleCache(sessionId: sessionId)
             
             if let cache = cache {
-                subject.send(cache.loadModels())
+                let models = cache.asModels()
+                
+                await MainActor.run {
+                    subject.send(models)
+                }
             }
 
             if let samples = await getLocationSamples(userId: userId, sessionId: sessionId, lastModified: cache?.timeStamp) {
-                subject.send(samples)
+                await MainActor.run {
+                    subject.send(samples)
+                }
             }
             
-            subject.send(completion: .finished)
+            await MainActor.run {
+                subject.send(completion: .finished)
+            }
         }
         
         return subject.eraseToAnyPublisher()
@@ -209,14 +281,22 @@ internal class UserSessionSampleRepository : UserSessionSampleRepositoryClient {
             let cache = await self.cache.getUserSessionOxygenSaturationSampleCache(sessionId: sessionId)
             
             if let cache = cache {
-                subject.send(cache.loadModels())
+                let models = cache.asModels()
+                
+                await MainActor.run {
+                    subject.send(models)
+                }
             }
 
             if let samples = await getOxygenSaturationSamples(userId: userId, sessionId: sessionId, lastModified: cache?.timeStamp) {
-                subject.send(samples)
+                await MainActor.run {
+                    subject.send(samples)
+                }
             }
             
-            subject.send(completion: .finished)
+            await MainActor.run {
+                subject.send(completion: .finished)
+            }
         }
         
         return subject.eraseToAnyPublisher()
@@ -229,14 +309,22 @@ internal class UserSessionSampleRepository : UserSessionSampleRepositoryClient {
             let cache = await self.cache.getUserSessionPowerSampleCache(sessionId: sessionId)
             
             if let cache = cache {
-                subject.send(cache.loadModels())
+                let models = cache.asModels()
+                
+                await MainActor.run {
+                    subject.send(models)
+                }
             }
 
             if let samples = await getPowerSamples(userId: userId, sessionId: sessionId, lastModified: cache?.timeStamp) {
-                subject.send(samples)
+                await MainActor.run {
+                    subject.send(samples)
+                }
             }
             
-            subject.send(completion: .finished)
+            await MainActor.run {
+                subject.send(completion: .finished)
+            }
         }
         
         return subject.eraseToAnyPublisher()
@@ -249,14 +337,22 @@ internal class UserSessionSampleRepository : UserSessionSampleRepositoryClient {
             let cache = await self.cache.getUserSessionSpeedSampleCache(sessionId: sessionId)
             
             if let cache = cache {
-                subject.send(cache.loadModels())
+                let models = cache.asModels()
+                
+                await MainActor.run {
+                    subject.send(models)
+                }
             }
 
             if let samples = await getSpeedSamples(userId: userId, sessionId: sessionId, lastModified: cache?.timeStamp) {
-                subject.send(samples)
+                await MainActor.run {
+                    subject.send(samples)
+                }
             }
             
-            subject.send(completion: .finished)
+            await MainActor.run {
+                subject.send(completion: .finished)
+            }
         }
         
         return subject.eraseToAnyPublisher()
@@ -269,14 +365,22 @@ internal class UserSessionSampleRepository : UserSessionSampleRepositoryClient {
             let cache = await self.cache.getUserSessionStepsSampleCache(sessionId: sessionId)
             
             if let cache = cache {
-                subject.send(cache.loadModels())
+                let models = cache.asModels()
+                
+                await MainActor.run {
+                    subject.send(models)
+                }
             }
 
             if let samples = await getStepsSamples(userId: userId, sessionId: sessionId, lastModified: cache?.timeStamp) {
-                subject.send(samples)
+                await MainActor.run {
+                    subject.send(samples)
+                }
             }
             
-            subject.send(completion: .finished)
+            await MainActor.run {
+                subject.send(completion: .finished)
+            }
         }
         
         return subject.eraseToAnyPublisher()

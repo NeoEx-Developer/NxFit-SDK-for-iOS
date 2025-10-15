@@ -7,6 +7,7 @@
 
 import Foundation
 import os
+import NXFitConfig
 import NXFitModels
 
 @preconcurrency
@@ -14,13 +15,13 @@ internal class ApiRequest {
     private let id: UUID
     private var baseUrl: URL? = nil
     private var url: String
-    private var method: HTTPMethod
+    private var method: HttpMethod
     private var body: Data? = nil
     private var queryParameters: Dictionary<String, String> = [:]
     private var headers: Dictionary<String, String> = [:]
     private var retryStrategy: ApiRetryStrategy = .noRetry
     
-    internal init(_ url: String, _ method: HTTPMethod, contentType: String = "application/json") {
+    internal init(_ url: String, _ method: HttpMethod, contentType: String = "application/json") {
         self.id = UUID()
         self.url = url
         self.method = method
@@ -75,7 +76,7 @@ internal class ApiRequest {
         let headers = self.headers
         let body = self.body
         
-        let (respBody, response) = try await retry {
+        let (responseBody, response) = try await retry {
             var request = URLRequest(url: url)
 
             request.httpMethod = method
@@ -84,16 +85,18 @@ internal class ApiRequest {
             request.cachePolicy = .reloadIgnoringLocalCacheData
             request.timeoutInterval = 30 //seconds
             
-            let (respBody, response) = try await URLSession.shared.data(for: request)
+            let (responseBody, response) = try await URLSession.shared.data(for: request)
+            
+            ApiLogger.log(id, request, body, response, responseBody)
             
             guard let response = response as? HTTPURLResponse, (200 ..< 299) ~= response.statusCode else {
-                throw ApiRequest.processUnsuccessfulResponse(id, response: response, for: request, with: respBody)
+                throw ApiRequest.processUnsuccessfulResponse(id, response: response, for: request, with: responseBody)
             }
             
-            return (respBody, response)
+            return (responseBody, response)
         }
         
-        return ApiResponse(id, response, respBody)
+        return ApiResponse(id, response, responseBody)
     }
             
     private func buildUrl() -> URL {
@@ -117,7 +120,7 @@ internal class ApiRequest {
             catch ApiError.tooManyRequests {
                 let delay = self.retryStrategy.calculateDelay(attempt: attempt)
 
-                ApiLogger.instance.error("API \(self.id.uuidString); timestamp: \(Date.now); error: too many requests; retrying request (retry \(attempt)/\(maxAttempts)) in \(delay.logFormat)")
+                ApiLogger.info(self.id, message: "timestamp: \(Date.now); error: too many requests; retrying request (retry \(attempt)/\(maxAttempts)) in \(delay.logFormat)")
                 
                 try await Task.sleep(for: delay)
             }
@@ -128,7 +131,7 @@ internal class ApiRequest {
             catch {
                 let delay = self.retryStrategy.calculateDelay(attempt: attempt)
                 
-                ApiLogger.instance.error("API \(self.id.uuidString); timestamp: \(Date.now); error: \(error.localizedDescription); retrying request (retry \(attempt)/\(maxAttempts)) in \(delay.logFormat)")
+                ApiLogger.info(self.id, message: "timestamp: \(Date.now); error: \(error.localizedDescription); retrying request (retry \(attempt)/\(maxAttempts)) in \(delay.logFormat)")
                 
                 try await Task.sleep(for: delay)
             }
@@ -138,19 +141,13 @@ internal class ApiRequest {
     }
     
     private static func processUnsuccessfulResponse(_ id: UUID, response: URLResponse, for request: URLRequest, with body: Data?) -> ApiError {
-        ApiLogger.instance.debug("API \(id.uuidString); processUnsuccessfulResponse: HTTP \(request.httpMethod ?? "") request unsuccessful response for: \(response.url?.absoluteString ?? "no URL")")
-        
         guard let resp = response as? HTTPURLResponse else {
             return ApiError.unknown
         }
-        
-        ApiLogger.instance.debug("API \(id.uuidString); processUnsuccessfulResponse: Status code: \(resp.statusCode)")
 
         var responseBody: String? = nil
         if let body = body, !body.isEmpty {
             responseBody = String(data: body, encoding: .utf8)
-            
-            ApiLogger.instance.debug("API \(id.uuidString); processUnsuccessfulResponse: Response body: \(responseBody ?? "N/A")")
         }
         
         switch(resp.statusCode) {

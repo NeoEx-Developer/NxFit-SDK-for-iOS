@@ -13,13 +13,17 @@ public struct Configuration {
     /// Base URL for the SDK, including the protocol.
     public let baseUrl: URL
     
-    /// API Version
-    public let apiVersion: String
+    /// Used to assist with debugging HTTP requests.
+    /// Default value is ``HttpLogLevel/none``.
+    public let httpLogLevel: HttpLogLevel
+    
+    package let apiVersion: String = "1.0"
     
     /// Construct the configuration container
     /// - Parameter baseUrl: Base URL for the SDK, including the protocol.
-    public init(baseUrl: URL, apiVersion: String = "1.0") {
+    /// - Parameter httpLogLevel: Used to assist with debugging HTTP requests.
+    public init(baseUrl: URL, httpLogLevel: HttpLogLevel = .none) {
         self.baseUrl = baseUrl
-        self.apiVersion = apiVersion
+        self.httpLogLevel = httpLogLevel
     }
 }

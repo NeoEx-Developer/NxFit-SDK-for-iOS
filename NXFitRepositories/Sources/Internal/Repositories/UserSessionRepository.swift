@@ -29,14 +29,22 @@ internal class UserSessionRepository : UserSessionRepositoryClient {
             let cache = await self.cache.getUserSessionCache(sessionId: sessionId)
             
             if let cache = cache {
-                subject.send(cache.asModel())
+                let model = cache.asModel()
+                
+                await MainActor.run {
+                    subject.send(model)
+                }
             }
 
             if let session = await getSessionById(userId: userId, sessionId: sessionId, lastModified: cache?.timeStamp) {
-                subject.send(session)
+                await MainActor.run {
+                    subject.send(session)
+                }
             }
             
-            subject.send(completion: .finished)
+            await MainActor.run {
+                subject.send(completion: .finished)
+            }
         }
         
         return subject.eraseToAnyPublisher()
@@ -52,14 +60,22 @@ internal class UserSessionRepository : UserSessionRepositoryClient {
             let cache = await self.cache.getSessionMetricsSummaryCache(userId: userId, from: filterStartDate, to: filterEndDate, groupBy: groupBy)
             
             if let cache = cache {
-                subject.send(cache.asModel())
+                let model = cache.asModel()
+                
+                await MainActor.run {
+                    subject.send(model)
+                }
             }
             
             if let summary = await getSessionMetricsSummary(userId: userId, from: filterStartDate, to: filterEndDate, groupBy: groupBy, eTag: cache?.eTag) {
-                subject.send(summary)
+                await MainActor.run {
+                    subject.send(summary)
+                }
             }
 
-            subject.send(completion: .finished)
+            await MainActor.run {
+                subject.send(completion: .finished)
+            }
         }
         
         return subject.eraseToAnyPublisher()
@@ -75,14 +91,22 @@ internal class UserSessionRepository : UserSessionRepositoryClient {
             let cache = await self.cache.getUserSessionListCache(userId: userId, from: filterStartDate, to: filterEndDate, pagination: pagination)
             
             if let cache = cache {
-                subject.send(cache.loadModels())
+                let models = cache.asModels()
+                
+                await MainActor.run {
+                    subject.send(models)
+                }
             }
 
             if let sessions = await getSessions(userId: userId, from: filterStartDate, to: filterEndDate, eTag: cache?.eTag, pagination: pagination) {
-                subject.send(sessions)
+                await MainActor.run {
+                    subject.send(sessions)
+                }
             }
             
-            subject.send(completion: .finished)
+            await MainActor.run {
+                subject.send(completion: .finished)
+            }
         }
         
         return subject.eraseToAnyPublisher()
@@ -95,14 +119,22 @@ internal class UserSessionRepository : UserSessionRepositoryClient {
             let cache = await self.cache.getUserSessionHeartRateZoneCache(sessionId: sessionId)
             
             if let cache = cache {
-                subject.send(cache.loadModels())
+                let models = cache.asModels()
+                
+                await MainActor.run {
+                    subject.send(models)
+                }
             }
 
             if let zones = await getHeartRateZonesById(userId: userId, sessionId: sessionId, lastModified: cache?.timeStamp) {
-                subject.send(zones)
+                await MainActor.run {
+                    subject.send(zones)
+                }
             }
             
-            subject.send(completion: .finished)
+            await MainActor.run {
+                subject.send(completion: .finished)
+            }
         }
         
         return subject.eraseToAnyPublisher()
@@ -118,14 +150,22 @@ internal class UserSessionRepository : UserSessionRepositoryClient {
             let cache = await self.cache.getSessionHeartRateZoneSummaryCache(userId: userId, from: filterStartDate, to: filterEndDate)
             
             if let cache = cache {
-                subject.send(cache.loadModels())
+                let models = cache.asModels()
+                
+                await MainActor.run {
+                    subject.send(models)
+                }
             }
 
             if let zones = await getHeartRateZonesSummary(userId: userId, from: filterStartDate, to: filterEndDate, eTag: cache?.eTag) {
-                subject.send(zones)
+                await MainActor.run {
+                    subject.send(zones)
+                }
             }
             
-            subject.send(completion: .finished)
+            await MainActor.run {
+                subject.send(completion: .finished)
+            }
         }
         
         return subject.eraseToAnyPublisher()

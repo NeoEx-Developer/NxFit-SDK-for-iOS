@@ -29,14 +29,22 @@ internal class UserRepository : UserRepositoryClient {
             let cache = await self.cache.getUserCache()
             
             if let cache = cache {
-                subject.send(cache.asModel())
+                let model = cache.asModel()
+                
+                await MainActor.run {
+                    subject.send(model)
+                }
             }
 
             if let user = await getUser(eTag: cache?.eTag) {
-                subject.send(user)
+                await MainActor.run {
+                    subject.send(user)
+                }
             }
             
-            subject.send(completion: .finished)
+            await MainActor.run {
+                subject.send(completion: .finished)
+            }
         }
         
         return subject.eraseToAnyPublisher()

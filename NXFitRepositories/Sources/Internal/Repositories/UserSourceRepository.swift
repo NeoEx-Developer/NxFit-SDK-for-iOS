@@ -29,14 +29,22 @@ internal class UserSourceRepository : UserSourceRepositoryClient {
             let cache = await self.cache.getSourceCache(sourceId: sourceId)
             
             if let cache = cache {
-                subject.send(cache.asModel())
+                let model = cache.asModel()
+                
+                await MainActor.run {
+                    subject.send(model)
+                }
             }
             
             if let source = await self.getSourceById(sourceId: sourceId, lastModified: cache?.timeStamp) {
-                subject.send(source)
+                await MainActor.run {
+                    subject.send(source)
+                }
             }
             
-            subject.send(completion: .finished)
+            await MainActor.run {
+                subject.send(completion: .finished)
+            }
         }
         
         return subject.eraseToAnyPublisher()
@@ -49,14 +57,22 @@ internal class UserSourceRepository : UserSourceRepositoryClient {
             let cache = await self.cache.getSourceListCache()
             
             if let cache = cache {
-                subject.send(cache.loadModels())
+                let models = cache.asModels()
+                
+                await MainActor.run {
+                    subject.send(models)
+                }
             }
             
             if let sources = await self.listSources(eTag: cache?.eTag) {
-                subject.send(sources)
+                await MainActor.run {
+                    subject.send(sources)
+                }
             }
             
-            subject.send(completion: .finished)
+            await MainActor.run {
+                subject.send(completion: .finished)
+            }
         }
         
         return subject.eraseToAnyPublisher()

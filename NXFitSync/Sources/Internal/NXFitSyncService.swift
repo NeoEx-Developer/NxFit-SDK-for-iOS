@@ -7,14 +7,12 @@
 
 import Foundation
 import Combine
-import Logging
 import NXFitAuth
 import NXFitCommon
 import NXFitConfig
 import NXFitServices
 
 internal class NXFitSyncService : NXFitSync {
-    private let logger: Logger
     private let userId: Int
     private let authProvider: AuthProviding
     private let configProvider: ConfigurationProviding
@@ -23,7 +21,6 @@ internal class NXFitSyncService : NXFitSync {
     private let hkManager: HealthKitManager
     
     internal init(_ configProvider: ConfigurationProviding, _ authProvider: AuthProviding) {
-        self.logger = Logging.create(identifier: String(describing: NXFitSyncService.self))
         self.userId = authProvider.userId
         self.authProvider = authProvider
         self.configProvider = configProvider

@@ -8,6 +8,7 @@
 import Foundation
 import NXFitAuth
 import NXFitConfig
+import NXFitServices
 
 ///  Factory for the NXFit SDK on iOS and watchOS.
 ///
@@ -28,6 +29,8 @@ public class NXFitFactory {
     ///   - authProvider: Provides the relevant auth details to the SDK e.g. auth status & access token.
     /// - Returns: A configured instance of the SDK.
     public static func build(_ configProvider: ConfigurationProviding, _ authProvider: AuthProviding) -> NXFit {
+        ApiLogger.setLogLevel(configProvider.configuration.httpLogLevel)
+        
         #if os(watchOS)
         return NXFitWatchService(configProvider, authProvider)
         #else

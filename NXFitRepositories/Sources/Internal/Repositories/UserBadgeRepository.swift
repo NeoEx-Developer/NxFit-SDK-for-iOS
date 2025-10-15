@@ -31,14 +31,22 @@ internal class UserBadgeRepository : UserBadgeRepositoryClient {
             let cache = await self.cache.getUserBadgeCache(for: filterDate)
             
             if let cache = cache {
-                subject.send(cache.loadModels())
+                let models = cache.asModels()
+                
+                await MainActor.run {
+                    subject.send(models)
+                }
             }
             
             if let sessions = await self.getBadges(for: filterDate, eTag: cache?.eTag) {
-                subject.send(sessions)
+                await MainActor.run {
+                    subject.send(sessions)
+                }
             }
             
-            subject.send(completion: .finished)
+            await MainActor.run {
+                subject.send(completion: .finished)
+            }
         }
         
         return subject.eraseToAnyPublisher()

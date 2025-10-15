@@ -82,27 +82,27 @@ extension ApiRequest {
     
     //MARK: HTTP METHOD CONSTRUCTOR EXTENSIONS
     internal static func delete(_ url: String) -> ApiRequest {
-        return ApiRequest(url, HTTPMethod.delete)
+        return ApiRequest(url, HttpMethod.delete)
     }
     
     internal static func get(_ url: String) -> ApiRequest {
-        return ApiRequest(url, HTTPMethod.get)
+        return ApiRequest(url, HttpMethod.get)
     }
     
     internal static func head(_ url: String) -> ApiRequest {
-        return ApiRequest(url, HTTPMethod.head)
+        return ApiRequest(url, HttpMethod.head)
     }
     
     internal static func patch(_ url: String) -> ApiRequest {
-        return ApiRequest(url, HTTPMethod.patch, contentType: "application/json-patch+json")
+        return ApiRequest(url, HttpMethod.patch, contentType: "application/json-patch+json")
     }
     
     internal static func post(_ url: String) -> ApiRequest {
-        return ApiRequest(url, HTTPMethod.post)
+        return ApiRequest(url, HttpMethod.post)
     }
     
     internal static func put(_ url: String) -> ApiRequest {
-        return ApiRequest(url, HTTPMethod.put)
+        return ApiRequest(url, HttpMethod.put)
     }
     
     private func parseIfModifiedSince(date: Date) -> String {

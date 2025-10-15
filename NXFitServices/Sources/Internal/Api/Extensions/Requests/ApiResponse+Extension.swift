@@ -21,7 +21,7 @@ extension ApiResponse {
             return try jsonDecoder.decode(TResponse.self, from: data)
         }
         catch {
-            ApiLogger.instance.error("API \(self.requestId.uuidString); asReponse<\(String(describing: TResponse.self))>: failed to parse response body json.")
+            ApiLogger.err(self.requestId, message: "asOptionalResponse<\(String(describing: TResponse.self))>: failed to parse response body json with error: \(error.localizedDescription).")
             
             throw error
         }
@@ -41,7 +41,7 @@ extension ApiResponse {
             return modelProvider(responseT)
         }
         catch {
-            ApiLogger.instance.error("API \(self.requestId.uuidString); asReponse<\(String(describing: TResponse.self))>: failed to parse response body json.")
+            ApiLogger.err(self.requestId, message: "asOptionalResponse<\(String(describing: TResponse.self)), \(String(describing: TModel.self))>: failed to parse response body json with error: \(error.localizedDescription).")
             
             throw error
         }
@@ -61,7 +61,7 @@ extension ApiResponse {
             return modelProvider(responseT)
         }
         catch {
-            ApiLogger.instance.error("API \(self.requestId.uuidString); asReponse<\(String(describing: TResponse.self))>: failed to parse response body json.")
+            ApiLogger.err(self.requestId, message: "asOptionalResponse<\(String(describing: TResponse.self)), \(String(describing: TModel.self))>: failed to parse response body json with error: \(error.localizedDescription).")
             
             throw error
         }
@@ -69,7 +69,7 @@ extension ApiResponse {
     
     internal func asResponse<TResponse : Decodable>() throws -> TResponse {
         guard let data = self.data, !data.isEmpty else {
-            ApiLogger.instance.error("API \(self.requestId.uuidString); asReponse<\(String(describing: TResponse.self))>: no response body to parse.")
+            ApiLogger.err(self.requestId, message: "asReponse<\(String(describing: TResponse.self))>: no response body to parse.")
             
             throw ApiError.responseBodyMissing
         }
@@ -81,7 +81,7 @@ extension ApiResponse {
             return try jsonDecoder.decode(TResponse.self, from: data)
         }
         catch {
-            ApiLogger.instance.error("API \(self.requestId.uuidString); asReponse<\(String(describing: TResponse.self))>: failed to parse response body json.")
+            ApiLogger.err(self.requestId, message: "asReponse<\(String(describing: TResponse.self))>: failed to parse response body json with error: \(error.localizedDescription).")
             
             throw error
         }
@@ -89,7 +89,7 @@ extension ApiResponse {
     
     internal func asResponse<TResponse : Decodable, TModel>(modelProvider: (TResponse) -> TModel) throws -> TModel {
         guard let data = self.data, !data.isEmpty else {
-            ApiLogger.instance.error("API \(self.requestId.uuidString); asReponse<\(String(describing: TResponse.self)), \(String(describing: TModel.self))>: no response body to parse.")
+            ApiLogger.err(self.requestId, message: "asReponse<\(String(describing: TResponse.self)), \(String(describing: TModel.self))>: no response body to parse.")
             
             throw ApiError.responseBodyMissing
         }
@@ -103,7 +103,7 @@ extension ApiResponse {
             return modelProvider(responseT)
         }
         catch {
-            ApiLogger.instance.error("API \(self.requestId.uuidString); asReponse<\(String(describing: TResponse.self)), \(String(describing: TModel.self))>: failed to parse response body json.")
+            ApiLogger.err(self.requestId, message: "asReponse<\(String(describing: TResponse.self)), \(String(describing: TModel.self))>: failed to parse response body json with error: \(error.localizedDescription).")
             
             throw error
         }
@@ -111,7 +111,7 @@ extension ApiResponse {
     
     internal func asCollectionResponse<TResponse : Decodable>() throws -> Collection<TResponse> {
         guard let data = self.data, !data.isEmpty else {
-            ApiLogger.instance.error("API \(self.requestId.uuidString); asCollectionResponse<\(String(describing: TResponse.self))>: no response body to parse.")
+            ApiLogger.err(self.requestId, message: "asCollectionResponse<\(String(describing: TResponse.self))>: no response body to parse.")
             
             throw ApiError.responseBodyMissing
         }
@@ -124,7 +124,7 @@ extension ApiResponse {
                 .asCollection()
         }
         catch {
-            ApiLogger.instance.error("API \(self.requestId.uuidString); asCollectionResponse<\(String(describing: TResponse.self))>: failed to parse response body json.")
+            ApiLogger.err(self.requestId, message: "asCollectionResponse<\(String(describing: TResponse.self))>: failed to parse response body json with error: \(error.localizedDescription).")
             
             throw error
         }
@@ -132,7 +132,7 @@ extension ApiResponse {
     
     internal func asCollectionResponse<TResponse : Decodable, TModel>(modelProvider: (TResponse) -> TModel) throws -> Collection<TModel> {
         guard let data = self.data, !data.isEmpty else {
-            ApiLogger.instance.error("API \(self.requestId.uuidString); asCollectionResponse<\(String(describing: TResponse.self)), \(String(describing: TModel.self))>: no response body to parse.")
+            ApiLogger.err(self.requestId, message: "asCollectionResponse<\(String(describing: TResponse.self)), \(String(describing: TModel.self))>: no response body to parse.")
             
             throw ApiError.responseBodyMissing
         }
@@ -145,7 +145,7 @@ extension ApiResponse {
                 .asCollection(modelProvider: modelProvider)
         }
         catch {
-            ApiLogger.instance.error("API \(self.requestId.uuidString); asCollectionResponse<\(String(describing: TResponse.self)), \(String(describing: TModel.self))>: failed to parse response body json.")
+            ApiLogger.err(self.requestId, message: "asCollectionResponse<\(String(describing: TResponse.self)), \(String(describing: TModel.self))>: failed to parse response body json with error: \(error.localizedDescription).")
             
             throw error
         }
@@ -153,7 +153,7 @@ extension ApiResponse {
     
     internal func asCollectionResponse<TResponse : Decodable, TResponseMetadata : ListMetadata, TModel, TModelMetadata : Metadata>(modelProvider: (TResponse) -> TModel, metadataProvider: (TResponseMetadata) -> TModelMetadata) throws -> CollectionWithMetadata<TModel, TModelMetadata> {
         guard let data = self.data, !data.isEmpty else {
-            ApiLogger.instance.error("API \(self.requestId.uuidString); asCollectionResponse<\(String(describing: TResponse.self)), \(String(describing: TResponseMetadata.self)), \(String(describing: TModel.self)), \(String(describing: TModelMetadata.self))>: no response body to parse.")
+            ApiLogger.err(self.requestId, message: "asCollectionResponse<\(String(describing: TResponse.self)), \(String(describing: TResponseMetadata.self)), \(String(describing: TModel.self)), \(String(describing: TModelMetadata.self))>: no response body to parse.")
             
             throw ApiError.responseBodyMissing
         }
@@ -166,7 +166,7 @@ extension ApiResponse {
                 .asCollection(modelProvider: modelProvider, metadataProvider: metadataProvider)
         }
         catch {
-            ApiLogger.instance.error("API \(self.requestId.uuidString); asCollectionResponse<\(String(describing: TResponse.self)), \(String(describing: TResponseMetadata.self)), \(String(describing: TModel.self)), \(String(describing: TModelMetadata.self))>: failed to parse response body json.")
+            ApiLogger.err(self.requestId, message: "asCollectionResponse<\(String(describing: TResponse.self)), \(String(describing: TResponseMetadata.self)), \(String(describing: TModel.self)), \(String(describing: TModelMetadata.self))>: failed to parse response body json with error: \(error.localizedDescription).")
             
             throw error
         }

@@ -32,14 +32,22 @@ internal class SessionRepository : SessionRepositoryClient {
             let cache = await self.cache.getSessionListCache(from: filterStartDate, to: filterEndDate, filterBy: filterBy, pagination: pagination)
             
             if let cache = cache {
-                subject.send(cache.loadModels())
+                let models = cache.asModels()
+                
+                await MainActor.run {
+                    subject.send(models)
+                }
             }
             
             if let sessions = await self.getSessions(from: filterStartDate, to: filterEndDate, filterBy: filterBy, eTag: cache?.eTag, pagination: pagination) {
-                subject.send(sessions)
+                await MainActor.run {
+                    subject.send(sessions)
+                }
             }
             
-            subject.send(completion: .finished)
+            await MainActor.run {
+                subject.send(completion: .finished)
+            }
         }
         
         return subject.eraseToAnyPublisher()

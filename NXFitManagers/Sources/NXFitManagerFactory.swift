@@ -28,6 +28,8 @@ public class NXFitManagerFactory {
     ///   - localIntegrationsClient: Optional client which provides local integration management.
     /// - Returns: A configured instance of the SDK.
     public static func build(_ configProvider: ConfigurationProviding, _ authProvider: AuthProviding, localIntegrationsClient: LocalIntegrationsClient? = nil) -> NXFitManager {
+        ApiLogger.setLogLevel(configProvider.configuration.httpLogLevel)
+        
         return NXFitManagerService(configProvider, authProvider, localIntegrationsClient: localIntegrationsClient)
     }
 }

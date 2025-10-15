@@ -15,11 +15,11 @@ internal protocol CacheItemsProviding {
     
     var items: NSSet? { get }
     
-    func loadModels() -> CollectionWithMetadata<TModelProviding.TModel, UMetadata>
+    func asModels() -> CollectionWithMetadata<TModelProviding.TModel, UMetadata>
 }
 
 extension CacheItemsProviding {
-    internal func loadModels() -> CollectionWithMetadata<TModelProviding.TModel, UMetadata> {
+    internal func asModels() -> CollectionWithMetadata<TModelProviding.TModel, UMetadata> {
         var loaded: [TModelProviding.TModel] = []
         
         let typedItems = items?.map({ $0 as? TModelProviding })

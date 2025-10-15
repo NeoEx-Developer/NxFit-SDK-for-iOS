@@ -36,6 +36,8 @@ public class NXFitSyncBackground {
             return
         }
 
+        ApiLogger.setLogLevel(configProvider.configuration.httpLogLevel)
+        
         let store = HKHealthStore()
         let context = HKSyncContext(configProvider, healthStore: store, userId: userId, accessToken: accessToken, isBackgroundDelivery: true)
         
