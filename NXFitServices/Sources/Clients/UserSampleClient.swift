@@ -10,6 +10,8 @@ import HealthKit
 import NXFitModels
 
 public protocol UserSampleClient {
+    func sendActiveEnergyBurnedSamples(userId: Int, data: HealthSampleContainerModel<EnergyBurnedSampleModel>) async throws -> Void
+    func sendBasalEnergyBurnedSamples(userId: Int, data: HealthSampleContainerModel<EnergyBurnedSampleModel>) async throws -> Void
     func sendBloodPressureSamples(userId: Int, data: HealthSampleContainerModel<BloodPressureSampleModel>) async throws -> Void
     func sendBodyFatSamples(userId: Int, data: HealthSampleContainerModel<BodyFatSampleModel>) async throws -> Void
     func sendBodyMassIndexSamples(userId: Int, data: HealthSampleContainerModel<BodyMassIndexSampleModel>) async throws -> Void

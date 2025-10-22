@@ -14,6 +14,14 @@ package class UserSampleApiService : BaseApiService, UserSampleClient {
         super.init(configProvider, accessTokenProvider: accessTokenProvider)
     }
     
+    public func sendActiveEnergyBurnedSamples(userId: Int, data: HealthSampleContainerModel<EnergyBurnedSampleModel>) async throws {
+        try await sendData(userId: userId, sampleEndpoint: ApiSampleEndpoint.activeEnergyBurned, data: data.asDto(convert: EnergyBurnedSampleDto.init))
+    }
+    
+    public func sendBasalEnergyBurnedSamples(userId: Int, data: HealthSampleContainerModel<EnergyBurnedSampleModel>) async throws {
+        try await sendData(userId: userId, sampleEndpoint: ApiSampleEndpoint.basalEnergyBurned, data: data.asDto(convert: EnergyBurnedSampleDto.init))
+    }
+    
     public func sendBloodPressureSamples(userId: Int, data: HealthSampleContainerModel<BloodPressureSampleModel>) async throws {
         try await sendData(userId: userId, sampleEndpoint: ApiSampleEndpoint.bloodPressure, data: data.asDto(convert: BloodPressureSampleDto.init))
     }

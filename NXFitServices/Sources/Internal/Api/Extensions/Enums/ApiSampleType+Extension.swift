@@ -11,6 +11,10 @@ import HealthKit
 extension ApiSampleType {
     package static func map(_ quantityType: HKQuantityTypeIdentifier) -> ApiSampleType {
         switch(quantityType) {
+            case .activeEnergyBurned:
+                return .activeEnergyBurned
+            case .basalEnergyBurned:
+                return .basalEnergyBurned
             case .bloodPressureSystolic:
                 return .bloodPressure
             case .bloodPressureDiastolic:
@@ -46,6 +50,10 @@ extension ApiSampleType {
     
     package var endpoint: ApiSampleEndpoint {
         switch self {
+            case .activeEnergyBurned:
+                return ApiSampleEndpoint.activeEnergyBurned
+            case .basalEnergyBurned:
+                return ApiSampleEndpoint.basalEnergyBurned
             case .bloodPressure:
                 return ApiSampleEndpoint.bloodPressure
             case .bodyFatPercentage:

@@ -272,6 +272,8 @@ internal class HealthKitManager {
 
     private func syncHealth(_ context: HKSyncContext) async -> Void {
         await HKBloodPressureHealthSyncTask(context).run()
+        await HKHealthSyncTask<EnergyBurnedSampleDto>(context, quantityType: .activeEnergyBurned).run()
+        await HKHealthSyncTask<EnergyBurnedSampleDto>(context, quantityType: .basalEnergyBurned).run()
         await HKHealthSyncTask<BodyFatSampleDto>(context, quantityType: .bodyFatPercentage).run()
         await HKHealthSyncTask<BodyMassIndexSampleDto>(context, quantityType: .bodyMassIndex).run()
         await HKHealthSyncTask<BodyMassSampleDto>(context, quantityType: .bodyMass).run()

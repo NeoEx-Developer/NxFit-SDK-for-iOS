@@ -43,6 +43,8 @@ public class NXFitSyncBackground {
         
         _HKQueries.setupWorkoutBackgroundDelivery(store, context)
         _HKQueries.setupHealthBloodPressureBackgroundDelivery(store, context)
+        _HKQueries.setupHealthBackgroundDelivery(store, context, for: .activeEnergyBurned, and: EnergyBurnedSampleDto.self)
+        _HKQueries.setupHealthBackgroundDelivery(store, context, for: .basalEnergyBurned, and: EnergyBurnedSampleDto.self)
         _HKQueries.setupHealthBackgroundDelivery(store, context, for: .bodyFatPercentage, and: BodyFatSampleDto.self)
         _HKQueries.setupHealthBackgroundDelivery(store, context, for: .bodyMassIndex, and: BodyMassIndexSampleDto.self)
         _HKQueries.setupHealthBackgroundDelivery(store, context, for: .bodyMass, and: BodyMassSampleDto.self)
@@ -64,6 +66,8 @@ public class NXFitSyncBackground {
         let store = HKHealthStore()
         
         _HKQueries.stopWorkoutBackgroundDelivery(store)
+        _HKQueries.stopHealthBackgroundDelivery(store, for: .activeEnergyBurned)
+        _HKQueries.stopHealthBackgroundDelivery(store, for: .basalEnergyBurned)
         _HKQueries.stopHealthBackgroundDelivery(store, for: .bloodPressureSystolic)
         _HKQueries.stopHealthBackgroundDelivery(store, for: .bodyFatPercentage)
         _HKQueries.stopHealthBackgroundDelivery(store, for: .bodyMassIndex)

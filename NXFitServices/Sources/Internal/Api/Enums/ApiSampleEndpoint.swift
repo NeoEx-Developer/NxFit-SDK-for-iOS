@@ -8,7 +8,9 @@
 import Foundation
 
 package enum ApiSampleEndpoint : String {
-    case bloodPressure = "blood-pressure",
+    case activeEnergyBurned = "active-energy-burned",
+         basalEnergyBurned = "basal-energy-burned",
+         bloodPressure = "blood-pressure",
          bodyFatPercentage = "body-fat",
          bodyMassIndex = "body-mass-index",
          bodyMass = "body-mass",

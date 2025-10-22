@@ -10,6 +10,8 @@ import HealthKit
 
 package enum ApiSampleType {
     case other,
+         activeEnergyBurned,
+         basalEnergyBurned,
          bloodPressure,
          bodyFatPercentage,
          bodyMassIndex,
