@@ -17,7 +17,7 @@ extension UserSessionModel {
             startedOnLocal: dto.startedOnLocal,
             endedOnLocal: dto.endedOnLocal,
             distanceInMeters: dto.distanceInMeters,
-            energyBurnedInCalories: dto.energyBurnedInCalories,
+            energyBurnedInKilocalories: dto.energyBurnedInKilocalories,
             maximalOxygenConsumption: dto.maximalOxygenConsumption,
             source: SessionSourceDetailsModel(dto: dto.source),
             sync: SessionSyncDetailsModel(dto: dto.sync),

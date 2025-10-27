@@ -298,22 +298,22 @@ extension SessionListCacheItem {
         }
     }
     
-    internal var energyBurnedInCalories: Int32? {
+    internal var energyBurnedInKilocalories: Int32? {
         get {
-            willAccessValue(forKey: "energyBurnedInCalories")
-            defer { didAccessValue(forKey: "energyBurnedInCalories") }
+            willAccessValue(forKey: "energyBurnedInKilocalories")
+            defer { didAccessValue(forKey: "energyBurnedInKilocalories") }
 
-            return primitiveValue(forKey: "energyBurnedInCalories") as? Int32
+            return primitiveValue(forKey: "energyBurnedInKilocalories") as? Int32
         }
         set {
-            willChangeValue(forKey: "energyBurnedInCalories")
-            defer { didChangeValue(forKey: "energyBurnedInCalories") }
+            willChangeValue(forKey: "energyBurnedInKilocalories")
+            defer { didChangeValue(forKey: "energyBurnedInKilocalories") }
 
             guard let value = newValue else {
-                setPrimitiveValue(nil, forKey: "energyBurnedInCalories")
+                setPrimitiveValue(nil, forKey: "energyBurnedInKilocalories")
                 return
             }
-            setPrimitiveValue(value, forKey: "energyBurnedInCalories")
+            setPrimitiveValue(value, forKey: "energyBurnedInKilocalories")
         }
     }
 }

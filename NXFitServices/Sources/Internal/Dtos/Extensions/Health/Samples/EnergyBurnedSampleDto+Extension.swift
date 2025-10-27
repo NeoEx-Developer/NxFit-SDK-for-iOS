@@ -9,6 +9,6 @@ import NXFitModels
 
 extension EnergyBurnedSampleDto {
     internal convenience init(model: EnergyBurnedSampleModel) {
-        self.init(calories: model.calories, timestamp: model.timestamp, intervalInSeconds: model.intervalInSeconds)
+        self.init(kilocalories: model.kilocalories, timestamp: model.timestamp, intervalInSeconds: model.intervalInSeconds)
     }
 }

@@ -31,7 +31,7 @@ extension SessionMetricsSummaryCache : ModelProviding {
             avgBPM: self.avgBPM,
             maxBPM: Int(self.maxBPM),
             minBPM: Int(self.minBPM),
-            energyBurnedInCalories: Int(self.energyBurnedInCalories),
+            energyBurnedInKilocalories: Int(self.energyBurnedInKilocalories),
             activeTimeInSeconds: Int(self.activeTimeInSeconds),
             activityCount: Int(self.activityCount),
             activeTimeGoalInSeconds: Int(self.activeTimeGoalInSeconds)

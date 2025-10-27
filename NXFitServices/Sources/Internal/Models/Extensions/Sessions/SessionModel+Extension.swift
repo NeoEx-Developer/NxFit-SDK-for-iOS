@@ -17,7 +17,7 @@ extension SessionModel {
             startedOnLocal: dto.startedOnLocal,
             endedOnLocal: dto.endedOnLocal,
             distanceInMeters: dto.distanceInMeters,
-            energyBurnedInCalories: dto.energyBurnedInCalories,
+            energyBurnedInKilocalories: dto.energyBurnedInKilocalories,
             maximalOxygenConsumption: dto.maximalOxygenConsumption,
             heartRate: SessionHeartRateMetricsModel(dto: dto.heartRate),
             cadence: SessionCadenceMetricsModel(dto: dto.cadence),

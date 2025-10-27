@@ -11,7 +11,7 @@ internal struct SessionMetricsSummaryDto : Decodable {
     internal let avgBPM: Double
     internal let maxBPM: Int
     internal let minBPM: Int
-    internal let energyBurnedInCalories: Int
+    internal let energyBurnedInKilocalories: Int
     internal let activeTimeInSeconds: Int
     internal let activityCount: Int
     internal let activeTimeGoalInSeconds: Int
@@ -20,7 +20,7 @@ internal struct SessionMetricsSummaryDto : Decodable {
         avgBPM: Double,
         maxBPM: Int,
         minBPM: Int,
-        energyBurnedInCalories: Int,
+        energyBurnedInKilocalories: Int,
         activeTimeInSeconds: Int,
         activityCount: Int,
         activeTimeGoalInSeconds: Int
@@ -28,7 +28,7 @@ internal struct SessionMetricsSummaryDto : Decodable {
         self.avgBPM = avgBPM
         self.maxBPM = maxBPM
         self.minBPM = minBPM
-        self.energyBurnedInCalories = energyBurnedInCalories
+        self.energyBurnedInKilocalories = energyBurnedInKilocalories
         self.activeTimeInSeconds = activeTimeInSeconds
         self.activityCount = activityCount
         self.activeTimeGoalInSeconds = activeTimeGoalInSeconds

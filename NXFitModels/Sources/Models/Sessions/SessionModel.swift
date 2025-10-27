@@ -36,8 +36,8 @@ public struct SessionModel : Identifiable {
     /// Total distance for the session, measured in meters.
     public let distanceInMeters: Double?
     
-    /// Total energy burned for the session, measured in calories.
-    public let energyBurnedInCalories: Int?
+    /// Total energy burned for the session, measured in kcal.
+    public let energyBurnedInKilocalories: Int?
     
     /// VO2 consumption for the session,  measured in mL/kg/min.
     public let maximalOxygenConsumption: Double?
@@ -66,7 +66,7 @@ public struct SessionModel : Identifiable {
     ///   - startedOnLocal: Start date, time and local timezone for the session.
     ///   - endedOnLocal: End date, time and local timezone for the session.
     ///   - distanceInMeters: Optional. Total distance for the session, measured in meters.
-    ///   - energyBurnedInCalories: Optional. Total energy burned for the session, measured in calories.
+    ///   - energyBurnedInKilocalories: Optional. Total energy burned for the session, measured in kcal.
     ///   - maximalOxygenConsumption: Optional. VO2 consumption for the session,  measured in mL/kg/min.
     ///   - heartRate: Optional. Heart rate metrics for the session, measured in beats per minute.
     ///   - cadence: Optional. Cadence metrics for the session, measured in units per minute.
@@ -81,7 +81,7 @@ public struct SessionModel : Identifiable {
         startedOnLocal: DateTimeZone,
         endedOnLocal: DateTimeZone,
         distanceInMeters: Double?,
-        energyBurnedInCalories: Int?,
+        energyBurnedInKilocalories: Int?,
         maximalOxygenConsumption: Double?,
         heartRate: SessionHeartRateMetricsModel?,
         cadence: SessionCadenceMetricsModel?,
@@ -96,7 +96,7 @@ public struct SessionModel : Identifiable {
         self.startedOnLocal = startedOnLocal
         self.endedOnLocal = endedOnLocal
         self.distanceInMeters = distanceInMeters
-        self.energyBurnedInCalories = energyBurnedInCalories
+        self.energyBurnedInKilocalories = energyBurnedInKilocalories
         self.maximalOxygenConsumption = maximalOxygenConsumption
         self.heartRate = heartRate
         self.cadence = cadence

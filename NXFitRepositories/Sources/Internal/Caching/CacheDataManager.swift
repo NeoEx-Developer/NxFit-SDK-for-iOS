@@ -173,7 +173,7 @@ internal class CacheDataManager {
             cache.maxSpeedInMetersPerSecond = session.speed?.maxSpeedInMetersPerSecond
             cache.minSpeedInMetersPerSecond = session.speed?.minSpeedInMetersPerSecond
             cache.maxV02 = session.maximalOxygenConsumption
-            cache.energyBurnedInCalories = Int32(session.energyBurnedInCalories)
+            cache.energyBurnedInKilocalories = Int32(session.energyBurnedInKilocalories)
             cache.startDate = session.startedOnLocal.dateUtc
             cache.startDateOffset = Int32(session.startedOnLocal.timeZone.secondsFromGMT())
             cache.endDate = session.endedOnLocal.dateUtc
@@ -973,7 +973,7 @@ internal class CacheDataManager {
                 cacheItem.maxSpeedInMetersPerSecond = session.speed?.maxSpeedInMetersPerSecond
                 cacheItem.minSpeedInMetersPerSecond = session.speed?.minSpeedInMetersPerSecond
                 cacheItem.maxV02 = session.maximalOxygenConsumption
-                cacheItem.energyBurnedInCalories = Int32(session.energyBurnedInCalories)
+                cacheItem.energyBurnedInKilocalories = Int32(session.energyBurnedInKilocalories)
                 cacheItem.startDate = session.startedOnLocal.dateUtc
                 cacheItem.startDateOffset = Int32(session.startedOnLocal.timeZone.secondsFromGMT())
                 cacheItem.endDate = session.endedOnLocal.dateUtc
@@ -997,7 +997,7 @@ internal class CacheDataManager {
             cache.timeStamp = Date.now
             cache.avgBPM = summary.avgBPM
             cache.maxBPM = Int32(summary.maxBPM)
-            cache.energyBurnedInCalories = Int32(summary.energyBurnedInCalories)
+            cache.energyBurnedInKilocalories = Int32(summary.energyBurnedInKilocalories)
             cache.activeTimeInSeconds = Int32(summary.activeTimeInSeconds)
             cache.activityCount = Int32(summary.activityCount)
             cache.activeTimeGoalInSeconds = Int32(summary.activeTimeGoalInSeconds)
@@ -1136,7 +1136,7 @@ internal class CacheDataManager {
             for item in samples.results {
                 let cacheItem = UserSessionEnergyBurnedSampleCacheItem(context: self.backgroundCtx!)
                 
-                cacheItem.calories = item.calories
+                cacheItem.kilocalories = item.kilocalories
                 cacheItem.timestamp = item.timestamp
                 cacheItem.intervalInSeconds = Int32(item.intervalInSeconds)
                 cacheItem.activeTimeInSeconds = Int32(item.activeTimeInSeconds)
@@ -1427,7 +1427,7 @@ internal class CacheDataManager {
         cache.maxSpeedInMetersPerSecond = session.speed?.maxSpeedInMetersPerSecond
         cache.minSpeedInMetersPerSecond = session.speed?.minSpeedInMetersPerSecond
         cache.maxV02 = session.maximalOxygenConsumption
-        cache.energyBurnedInCalories = Int32(session.energyBurnedInCalories)
+        cache.energyBurnedInKilocalories = Int32(session.energyBurnedInKilocalories)
         cache.startDate = session.startedOnLocal.dateUtc
         cache.startDateOffset = Int32(session.startedOnLocal.timeZone.secondsFromGMT())
         cache.endDate = session.endedOnLocal.dateUtc

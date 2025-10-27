@@ -17,7 +17,7 @@ extension UserSessionEnergyBurnedSampleCacheItem {
 
     @NSManaged internal var activeTimeInSeconds: Int32
     @NSManaged internal var intervalInSeconds: Int32
-    @NSManaged internal var calories: Double
+    @NSManaged internal var kilocalories: Double
     @NSManaged internal var timestamp_: Date?
     @NSManaged internal var parent: UserSessionEnergyBurnedSampleCache?
 

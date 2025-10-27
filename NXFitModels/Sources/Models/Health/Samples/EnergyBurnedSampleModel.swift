@@ -9,10 +9,10 @@ import Foundation
 import HealthKit
 
 public class EnergyBurnedSampleModel : BaseHealthSampleModel {
-    public let calories: Double
+    public let kilocalories: Double
     
-    public required init(calories: Double, dateInterval: DateInterval) {
-        self.calories = calories
+    public required init(kilocalories: Double, dateInterval: DateInterval) {
+        self.kilocalories = kilocalories
         
         super.init(dateInterval)
     }

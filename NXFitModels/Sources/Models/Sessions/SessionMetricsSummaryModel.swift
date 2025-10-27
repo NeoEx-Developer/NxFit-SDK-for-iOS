@@ -19,8 +19,8 @@ public struct SessionMetricsSummaryModel {
     /// Minimum heart rate for the range, measured in beats per minute.
     public let minBPM: Int
     
-    /// Total energy burned for the range, measured in calories.
-    public let energyBurnedInCalories: Int
+    /// Total energy burned for the range, measured in kcal.
+    public let energyBurnedInKilocalories: Int
     
     /// Total active time for the range, measured in seconds.
     public let activeTimeInSeconds: Int
@@ -36,7 +36,7 @@ public struct SessionMetricsSummaryModel {
     ///   - avgBPM: Average heart rate for the range, measured in beats per minute.
     ///   - maxBPM: Maximum heart rate for the range, measured in beats per minute.
     ///   - minBPM: Minimum heart rate for the range, measured in beats per minute.
-    ///   - energyBurnedInCalories: Total energy burned for the range, measured in calories.
+    ///   - energyBurnedInKilocalories: Total energy burned for the range, measured in kcal.
     ///   - activeTimeInSeconds: Total active time for the range, measured in seconds.
     ///   - activityCount: Total number of activities within the range.
     ///   - activeTimeGoalInSeconds: Total active time goal for the range, measured in seconds.
@@ -44,7 +44,7 @@ public struct SessionMetricsSummaryModel {
         avgBPM: Double,
         maxBPM: Int,
         minBPM: Int,
-        energyBurnedInCalories: Int,
+        energyBurnedInKilocalories: Int,
         activeTimeInSeconds: Int,
         activityCount: Int,
         activeTimeGoalInSeconds: Int
@@ -52,7 +52,7 @@ public struct SessionMetricsSummaryModel {
         self.avgBPM = avgBPM
         self.maxBPM = maxBPM
         self.minBPM = minBPM
-        self.energyBurnedInCalories = energyBurnedInCalories
+        self.energyBurnedInKilocalories = energyBurnedInKilocalories
         self.activeTimeInSeconds = activeTimeInSeconds
         self.activityCount = activityCount
         self.activeTimeGoalInSeconds = activeTimeGoalInSeconds

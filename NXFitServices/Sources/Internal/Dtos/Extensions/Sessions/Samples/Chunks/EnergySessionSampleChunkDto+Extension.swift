@@ -9,6 +9,6 @@ import NXFitModels
 
 extension EnergySessionSampleChunkDto {
     internal convenience init(model: EnergySessionSampleChunkModel) {
-        self.init(calories: model.calories, startedOn: model.startedOn, endedOn: model.endedOn)
+        self.init(kilocalories: model.kilocalories, startedOn: model.startedOn, endedOn: model.endedOn)
     }
 }

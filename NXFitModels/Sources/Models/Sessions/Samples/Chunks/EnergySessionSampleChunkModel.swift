@@ -11,8 +11,8 @@ import HealthKit
 /// Energy session sample model
 public struct EnergySessionSampleChunkModel  {
     
-    /// Calories burned in kcal.
-    public let calories: Double
+    /// Energy burned in kcal.
+    public let kilocalories: Double
     
     /// Starting timestamp for sample measurement.
     public let startedOn: Date
@@ -20,13 +20,13 @@ public struct EnergySessionSampleChunkModel  {
     /// Optional. Ending timestamp for sample measurement.
     public let endedOn: Date?
 
-    /// Default constructor accepting the calories burned and an interval for the sample.
+    /// Default constructor accepting the kilocalories burned and an interval for the sample.
     /// - Parameters:
-    ///   - calories: `Double` Calories burned in kcal.
+    ///   - kilocalories: `Double` Energy burned in kcal.
     ///   - startedOn: `Date`  Starting timestamp for sample measurement.
     ///   - endedOn: Optional `Date`  Ending timestamp for sample measurement.
-    public init(calories: Double, startedOn: Date, endedOn: Date? = nil) {
-        self.calories = calories
+    public init(kilocalories: Double, startedOn: Date, endedOn: Date? = nil) {
+        self.kilocalories = kilocalories
         self.startedOn = startedOn
         self.endedOn = endedOn
     }

@@ -11,10 +11,10 @@ import NXFitServices
 
 extension EnergySessionSampleChunkDto : SessionSampleChunkCreating {
     internal static func createSample(_ quantityType: HKQuantityTypeIdentifier, _ quantity: HKQuantity, _ dateInterval: DateInterval) -> Self {
-        let calories = quantity.doubleValue(for: .kilocalorie())
+        let kilocalories = quantity.doubleValue(for: .kilocalorie())
         let startedOn = dateInterval.start
         let endedOn = dateInterval.duration > 0 ? dateInterval.end : nil
         
-        return self.init(calories: calories, startedOn: startedOn, endedOn: endedOn)
+        return self.init(kilocalories: kilocalories, startedOn: startedOn, endedOn: endedOn)
     }
 }

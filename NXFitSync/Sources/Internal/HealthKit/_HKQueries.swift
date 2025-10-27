@@ -139,6 +139,8 @@ internal class _HKQueries {
         }
         
         let cadenceSamples = try await withCheckedThrowingContinuation({ (continuation: CheckedContinuation<[CadenceSessionSampleChunkDto], Error>) in
+            var samples: [CadenceSessionSampleChunkDto] = []
+            
             store.execute(
                 HKQuantitySeriesSampleQuery(quantityType: .quantityType(forIdentifier: quantityType)!, predicate: HKQuery.predicateForObjects(from: workout), quantityHandler: { (query, quantity, dateInterval, quantitySample, complete, error) in
                     if let error = error {
@@ -151,9 +153,7 @@ internal class _HKQueries {
                         continuation.resume(returning: [])
                         return
                     }
-                    
-                    var samples: [CadenceSessionSampleChunkDto] = []
-                    
+
                     if #available(iOS 17, watchOS 10, *), quantityType == .cyclingCadence {
                         let valuePerMinute = Int(quantity.doubleValue(for: .count()))
                         
@@ -260,6 +260,8 @@ internal class _HKQueries {
     
     internal static func getWorkoutSamples<T : BaseSessionSampleChunkDto>(_ logger: Logger, _ store: HKHealthStore, workout: HKWorkout, quantityType: HKQuantityTypeIdentifier) async throws -> [T] where T : SessionSampleChunkCreating {
         let workoutSamples = try await withCheckedThrowingContinuation({ (continuation: CheckedContinuation<[T], Error>) in
+            var samples: [T] = []
+            
             store.execute(
                 HKQuantitySeriesSampleQuery(quantityType: .quantityType(forIdentifier: quantityType)!, predicate: HKQuery.predicateForObjects(from: workout), quantityHandler: { (query, quantity, dateInterval, quantitySample, complete, error) in
                     if let error = error {
@@ -272,8 +274,6 @@ internal class _HKQueries {
                         continuation.resume(returning: [])
                         return
                     }
-                    
-                    var samples: [T] = []
                     
                     samples.append(T.createSample(quantityType, quantity, dateInterval!))
                     

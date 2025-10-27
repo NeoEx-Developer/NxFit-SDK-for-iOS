@@ -13,8 +13,8 @@ extension SessionMetricsSummaryModel {
             avgBPM: dto.avgBPM,
             maxBPM: dto.maxBPM,
             minBPM: dto.minBPM,
-            energyBurnedInCalories: dto.activeTimeInSeconds,
-            activeTimeInSeconds: dto.energyBurnedInCalories,
+            energyBurnedInKilocalories: dto.energyBurnedInKilocalories,
+            activeTimeInSeconds: dto.activeTimeInSeconds,
             activityCount: dto.activityCount,
             activeTimeGoalInSeconds: dto.activeTimeGoalInSeconds
         )

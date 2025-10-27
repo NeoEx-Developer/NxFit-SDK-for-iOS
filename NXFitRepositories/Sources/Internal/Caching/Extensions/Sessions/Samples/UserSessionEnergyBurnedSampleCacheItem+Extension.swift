@@ -18,7 +18,7 @@ extension UserSessionEnergyBurnedSampleCacheItem : ModelProviding {
     
     internal func asModel() -> EnergySessionSampleModel {
         return EnergySessionSampleModel(
-            calories: self.calories,
+            kilocalories: self.kilocalories,
             timestamp: self.timestamp,
             intervalInSeconds: Int(self.intervalInSeconds),
             activeTimeInSeconds: Int(self.activeTimeInSeconds)

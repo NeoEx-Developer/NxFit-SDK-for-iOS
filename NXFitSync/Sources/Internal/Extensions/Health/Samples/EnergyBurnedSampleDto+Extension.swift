@@ -11,10 +11,10 @@ import NXFitServices
 
 extension EnergyBurnedSampleDto : HealthSampleCreating {
     static func createSample(_ quantity: HKQuantity, _ dateInterval: DateInterval) -> Self {
-        let calories = quantity.doubleValue(for: .kilocalorie())
+        let kilocalories = quantity.doubleValue(for: .kilocalorie())
         let timestamp = dateInterval.start
         let interval = Int(dateInterval.duration)
         
-        return self.init(calories: calories, timestamp: timestamp, intervalInSeconds: interval)
+        return self.init(kilocalories: kilocalories, timestamp: timestamp, intervalInSeconds: interval)
     }
 }

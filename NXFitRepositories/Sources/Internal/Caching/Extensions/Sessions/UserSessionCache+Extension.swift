@@ -61,7 +61,7 @@ extension UserSessionCache : ModelProviding {
             startedOnLocal: DateTimeZone.create(self.startDate, offset: Int(self.startDateOffset)),
             endedOnLocal: DateTimeZone.create(self.endDate, offset: Int(self.endDateOffset)),
             distanceInMeters: self.distanceInMeters,
-            energyBurnedInCalories: Int(self.energyBurnedInCalories),
+            energyBurnedInKilocalories: Int(self.energyBurnedInKilocalories),
             maximalOxygenConsumption: self.maxV02,
             source: SessionSourceDetailsModel(
                 integration: self.sourceIntegration,

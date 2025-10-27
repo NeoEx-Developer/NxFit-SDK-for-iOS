@@ -17,7 +17,7 @@ internal struct UserSessionDto : Decodable {
     internal let startedOnLocal: DateTimeZone
     internal let endedOnLocal: DateTimeZone
     internal let distanceInMeters: Double?
-    internal let energyBurnedInCalories: Int?
+    internal let energyBurnedInKilocalories: Int?
     internal let maximalOxygenConsumption: Double?
     internal let source: SessionSourceDetailsDto
     internal let sync: SessionSyncDetailsDto?
@@ -35,7 +35,7 @@ internal struct UserSessionDto : Decodable {
         case startedOnLocal
         case endedOnLocal
         case distanceInMeters
-        case energyBurnedInCalories
+        case energyBurnedInKilocalories
         case maximalOxygenConsumption
         case source
         case sync
@@ -54,7 +54,7 @@ internal struct UserSessionDto : Decodable {
         startedOnLocal: DateTimeZone,
         endedOnLocal: DateTimeZone,
         distanceInMeters: Double?,
-        energyBurnedInCalories: Int?,
+        energyBurnedInKilocalories: Int?,
         maximalOxygenConsumption: Double?,
         source: SessionSourceDetailsDto,
         sync: SessionSyncDetailsDto?,
@@ -71,7 +71,7 @@ internal struct UserSessionDto : Decodable {
         self.startedOnLocal = startedOnLocal
         self.endedOnLocal = endedOnLocal
         self.distanceInMeters = distanceInMeters
-        self.energyBurnedInCalories = energyBurnedInCalories
+        self.energyBurnedInKilocalories = energyBurnedInKilocalories
         self.maximalOxygenConsumption = maximalOxygenConsumption
         self.source = source
         self.sync = sync
@@ -92,7 +92,7 @@ internal struct UserSessionDto : Decodable {
         self.startedOnLocal = try container.decode(DateTimeZone.self, forKey: .startedOnLocal)
         self.endedOnLocal = try container.decode(DateTimeZone.self, forKey: .endedOnLocal)
         self.distanceInMeters = try container.decodeIfPresent(Double.self, forKey: .distanceInMeters)
-        self.energyBurnedInCalories = try container.decodeIfPresent(Int.self, forKey: .energyBurnedInCalories)
+        self.energyBurnedInKilocalories = try container.decodeIfPresent(Int.self, forKey: .energyBurnedInKilocalories)
         self.maximalOxygenConsumption = try container.decodeIfPresent(Double.self, forKey: .maximalOxygenConsumption)
         self.source = try container.decode(SessionSourceDetailsDto.self, forKey: .source)
         self.sync = try container.decodeIfPresent(SessionSyncDetailsDto.self, forKey: .sync)

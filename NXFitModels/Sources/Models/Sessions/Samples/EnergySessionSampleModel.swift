@@ -11,8 +11,8 @@ import HealthKit
 /// Energy session sample model
 public struct EnergySessionSampleModel  {
     
-    /// Calories burned in kcal.
-    public let calories: Double
+    /// Energy burned in kcal.
+    public let kilocalories: Double
     
     /// Starting timestamp for sample measurement.
     public let timestamp: Date
@@ -23,14 +23,14 @@ public struct EnergySessionSampleModel  {
     /// Cumulative active time since the start of the session, in seconds.
     public let activeTimeInSeconds: Int
 
-    /// Default constructor accepting the calories burned and an interval for the sample.
+    /// Default constructor accepting the kilocalories burned and an interval for the sample.
     /// - Parameters:
-    ///   - calories: `Double` Calories burned in kcal.
+    ///   - kilocalories: `Double` Energy burned in kcal.
     ///   - timestamp: `Date`  Starting timestamp for sample measurement.
     ///   - intervalInSeconds: `Int`  Interval for sample measurement in seconds.
     ///   - activeTimeInSeconds: `Int`Cumulative active time since the start of the session, in seconds.
-    public init(calories: Double, timestamp: Date, intervalInSeconds: Int, activeTimeInSeconds: Int) {
-        self.calories = calories
+    public init(kilocalories: Double, timestamp: Date, intervalInSeconds: Int, activeTimeInSeconds: Int) {
+        self.kilocalories = kilocalories
         self.timestamp = timestamp
         self.intervalInSeconds = intervalInSeconds
         self.activeTimeInSeconds = activeTimeInSeconds

@@ -14,7 +14,7 @@ extension SessionMetricsSummaryModel {
             avgBPM: 0,
             maxBPM: 0,
             minBPM: 0,
-            energyBurnedInCalories: 0,
+            energyBurnedInKilocalories: 0,
             activeTimeInSeconds: 0,
             activityCount: 0,
             activeTimeGoalInSeconds: 0

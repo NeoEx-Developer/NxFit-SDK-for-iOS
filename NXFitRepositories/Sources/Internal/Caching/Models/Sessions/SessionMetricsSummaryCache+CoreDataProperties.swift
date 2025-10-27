@@ -21,7 +21,7 @@ extension SessionMetricsSummaryCache {
     @NSManaged internal var activityCount: Int32
     @NSManaged internal var avgBPM: Double
     @NSManaged internal var endDate_: Date?
-    @NSManaged internal var energyBurnedInCalories: Int32
+    @NSManaged internal var energyBurnedInKilocalories: Int32
     @NSManaged internal var eTag: String?
     @NSManaged internal var groupBy: Int32
     @NSManaged internal var maxBPM: Int32

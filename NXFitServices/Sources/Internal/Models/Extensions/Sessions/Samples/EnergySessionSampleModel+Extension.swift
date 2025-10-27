@@ -10,7 +10,7 @@ import NXFitModels
 extension EnergySessionSampleModel {
     internal static func fromDto(dto: EnergySessionSampleDto) -> EnergySessionSampleModel {
         EnergySessionSampleModel(
-            calories: dto.calories,
+            kilocalories: dto.kilocalories,
             timestamp: dto.timestamp,
             intervalInSeconds: dto.intervalInSeconds,
             activeTimeInSeconds: dto.activeTimeInSeconds

@@ -51,7 +51,7 @@ extension SessionListCacheItem : ModelProviding {
             startedOnLocal: DateTimeZone.create(self.startDate, offset: Int(self.startDateOffset)),
             endedOnLocal: DateTimeZone.create(self.endDate, offset: Int(self.endDateOffset)),
             distanceInMeters: self.distanceInMeters,
-            energyBurnedInCalories: Int(self.energyBurnedInCalories),
+            energyBurnedInKilocalories: Int(self.energyBurnedInKilocalories),
             maximalOxygenConsumption: self.maxV02,
             heartRate: SessionHeartRateMetricsModel(avgBPM: self.avgBPM, maxBPM: Int(self.maxBPM), minBPM: Int(self.minBPM)),
             cadence: SessionCadenceMetricsModel(
