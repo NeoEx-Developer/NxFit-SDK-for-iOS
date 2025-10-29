@@ -17,7 +17,6 @@ extension HealthSampleContainerDto {
             sourceDeviceOS: source.deviceOS,
             sourceAppName: source.appName,
             sourceAppIdentifier: source.appIdentifier,
-            referenceId: nil,
             samples: samples
         )
     }

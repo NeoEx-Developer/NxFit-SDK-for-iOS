@@ -13,7 +13,6 @@ public struct HealthSampleContainerModel<T : BaseHealthSampleModel> {
     public let sourceDeviceOS: String?
     public let sourceAppName: String?
     public let sourceAppIdentifier: String?
-    public let referenceId: Int?
     public let samples: [T]
     
     public init(
@@ -24,7 +23,6 @@ public struct HealthSampleContainerModel<T : BaseHealthSampleModel> {
         sourceDeviceOS: String?,
         sourceAppName: String?,
         sourceAppIdentifier: String?,
-        referenceId: Int?,
         samples: [T]
     ) {
         self.integrationIdentifier = integrationIdentifier
@@ -34,7 +32,6 @@ public struct HealthSampleContainerModel<T : BaseHealthSampleModel> {
         self.sourceDeviceOS = sourceDeviceOS
         self.sourceAppName = sourceAppName
         self.sourceAppIdentifier = sourceAppIdentifier
-        self.referenceId = referenceId
         self.samples = samples
     }
 }

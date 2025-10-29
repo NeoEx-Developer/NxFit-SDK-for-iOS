@@ -15,7 +15,6 @@ package struct HealthSampleContainerDto<T : BaseHealthSampleDto> : Encodable {
     package let sourceDeviceOS: String?
     package let sourceAppName: String?
     package let sourceAppIdentifier: String?
-    package let referenceId: Int?
     package let samples: [T]
     
     package init(
@@ -26,7 +25,6 @@ package struct HealthSampleContainerDto<T : BaseHealthSampleDto> : Encodable {
         sourceDeviceOS: String?,
         sourceAppName: String?,
         sourceAppIdentifier: String?,
-        referenceId: Int?,
         samples: [T]
     ) {
         self.integrationIdentifier = integrationIdentifier
@@ -36,7 +34,6 @@ package struct HealthSampleContainerDto<T : BaseHealthSampleDto> : Encodable {
         self.sourceDeviceOS = sourceDeviceOS
         self.sourceAppName = sourceAppName
         self.sourceAppIdentifier = sourceAppIdentifier
-        self.referenceId = referenceId
         self.samples = samples
     }
 }

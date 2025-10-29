@@ -17,7 +17,6 @@ extension HealthSampleContainerModel {
             sourceDeviceOS: self.sourceDeviceOS,
             sourceAppName: self.sourceAppName,
             sourceAppIdentifier: self.sourceAppIdentifier,
-            referenceId: self.referenceId,
             samples: self.samples.map(convert)
         )
     }
