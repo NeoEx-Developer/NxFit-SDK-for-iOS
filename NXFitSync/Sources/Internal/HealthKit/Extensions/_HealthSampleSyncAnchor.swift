@@ -9,9 +9,9 @@ import Foundation
 import HealthKit
 
 extension _HealthSampleSyncAnchor {
-    internal var sampleType: HKQuantityTypeIdentifier {
-        get { HKQuantityTypeIdentifier(rawValue: sampleType_!) }
-        set { sampleType_ = newValue.rawValue }
+    internal var sampleType: String {
+        get { sampleType_! }
+        set { sampleType_ = newValue }
     }
     
     internal var timestamp: Date {

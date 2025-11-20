@@ -21,6 +21,7 @@ package enum ApiSampleEndpoint : String {
          oxygenSaturation = "oxygen-saturation",
          restingHeartRate = "resting-heartrate",
          respiratoryRate = "respiratory-rate",
+         sleep = "sleep-level",
          stepCount = "step",
          vo2Max = "maximal-oxygen-consumption",
          none = ""

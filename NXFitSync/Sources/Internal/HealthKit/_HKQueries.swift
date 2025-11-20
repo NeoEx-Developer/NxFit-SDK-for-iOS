@@ -9,6 +9,7 @@ import HealthKit
 import Logging
 import NXFitCommon
 import NXFitConfig
+import NXFitModels
 import NXFitServices
 
 internal class _HKQueries {
@@ -99,6 +100,68 @@ internal class _HKQueries {
             
             var existingSamples = mappedSourcesAndSamples[parsedSource] ?? []
             existingSamples.append(T.createSample(newSample.quantity, DateInterval(start: newSample.startDate, end: newSample.endDate)))
+            
+            mappedSourcesAndSamples.updateValue(existingSamples, forKey: parsedSource)
+        }
+        
+        return (anchor, mappedSourcesAndSamples)
+    }
+    
+    internal static func getSleepSamples(_ logger: Logger, _ store: HKHealthStore, anchor: HKQueryAnchor?) async throws -> (HKQueryAnchor?, Dictionary<SyncSource, [SleepSampleDto]>?) {
+        let calendar = Calendar.current
+        let startDate = calendar.date(byAdding: .month, value: -monthsBackToQuery, to: Date.now)
+        
+        let (anchor, samples) = try await withCheckedThrowingContinuation({ (continuation: CheckedContinuation<(HKQueryAnchor?, [HKCategorySample]?), Error>) in
+            store.execute(
+                HKAnchoredObjectQuery(type: .categoryType(forIdentifier: .sleepAnalysis)!, predicate: HKQuery.predicateForSamples(withStart: startDate, end: nil), anchor: anchor, limit: healthObjectLimit, resultsHandler: { (query, newSamples, deletedObjects, newAnchor, error) in
+                    if let error = error {
+                        logger.error("getSleepSamples: Failed to retrieve samples; error: \(error)")
+                        continuation.resume(throwing: error)
+                        return
+                    }
+
+                    guard let newSamples = newSamples as? [HKCategorySample] else {
+                        logger.debug("getSleepSamples: Failed to retrieve samples")
+                        continuation.resume(returning: (nil, nil))
+                        return
+                    }
+
+                    
+                    continuation.resume(returning: (newAnchor, newSamples))
+                })
+            )
+        })
+        
+        guard let samples = samples else {
+            return (nil, nil)
+        }
+        
+        var mappedSourcesAndSamples = Dictionary<SyncSource, [SleepSampleDto]>()
+        
+        for newSample in samples {
+            let level: ApiSleepLevel
+            
+            switch newSample.value {
+                case HKCategoryValueSleepAnalysis.asleepREM.rawValue:
+                    level = .rem
+                case HKCategoryValueSleepAnalysis.asleepUnspecified.rawValue:
+                    fallthrough
+                case HKCategoryValueSleepAnalysis.asleepCore.rawValue:
+                    level = .light
+                case HKCategoryValueSleepAnalysis.asleepDeep.rawValue:
+                    level = .deep
+                case HKCategoryValueSleepAnalysis.inBed.rawValue:
+                    fallthrough
+                case HKCategoryValueSleepAnalysis.awake.rawValue:
+                    level = .awake
+                default:
+                    continue
+                }
+            
+            let parsedSource = SyncSource.createFrom(newSample)
+            
+            var existingSamples = mappedSourcesAndSamples[parsedSource] ?? []
+            existingSamples.append(SleepSampleDto(value: level, dateInterval: DateInterval(start: newSample.startDate, end: newSample.endDate)))
             
             mappedSourcesAndSamples.updateValue(existingSamples, forKey: parsedSource)
         }
@@ -345,11 +408,40 @@ internal class _HKQueries {
         }
     }
     
-    internal static func stopHealthBackgroundDelivery(_ store: HKHealthStore, for quantityType: HKQuantityTypeIdentifier) -> Void {
-        store.disableBackgroundDelivery(for: .quantityType(forIdentifier: quantityType)!) { (success, error) in
+    internal static func setupHealthSleepBackgroundDelivery(_ store: HKHealthStore, _ context: HKSyncContext) -> Void {
+        let query = HKObserverQuery(sampleType: .categoryType(forIdentifier: .sleepAnalysis)!, predicate: nil, updateHandler: { query, handler, error in
             if let error = error {
                 let logger = Logging.create(identifier: String(describing: _HKQueries.self))
-                logger.error("stopHealthBackgroundDelivery: Failed to disableBackgroundDelivery for \(String(describing: quantityType.self)); error: \(error)")
+                logger.error("HKObserverQuery<SleepSampleDto>: Failed to query samples; error: \(error)")
+                
+                return
+            }
+
+            Task {
+                let task = HKSleepHealthSyncTask(context)
+                
+                await task.run()
+            }
+            
+            handler()
+        })
+        
+        store.execute(query)
+        store.enableBackgroundDelivery(for: .categoryType(forIdentifier: .sleepAnalysis)!, frequency: .immediate) { (success, error) in
+            if let error = error {
+                store.stop(query)
+                
+                let logger = Logging.create(identifier: String(describing: _HKQueries.self))
+                logger.error("setupHealthBackgroundDelivery: Failed to enableBackgroundDelivery for \(String(describing: SleepSampleDto.self)) samples; error: \(error)")
+            }
+        }
+    }
+    
+    internal static func stopHealthBackgroundDelivery(_ store: HKHealthStore, for objectType: HKObjectType) -> Void {
+        store.disableBackgroundDelivery(for: objectType) { (success, error) in
+            if let error = error {
+                let logger = Logging.create(identifier: String(describing: _HKQueries.self))
+                logger.error("stopHealthBackgroundDelivery: Failed to disableBackgroundDelivery for \(String(describing: objectType.self)); error: \(error)")
             }
         }
     }

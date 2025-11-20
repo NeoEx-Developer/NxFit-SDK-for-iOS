@@ -22,6 +22,7 @@ public protocol UserSampleClient {
     func sendHeightSamples(userId: Int, data: HealthSampleContainerModel<HeightSampleModel>) async throws -> Void
     func sendOxygenSaturationSamples(userId: Int, data: HealthSampleContainerModel<OxygenSaturationSampleModel>) async throws -> Void
     func sendRespiratoryRateSamples(userId: Int, data: HealthSampleContainerModel<RespiratoryRateSampleModel>) async throws -> Void
+    func sendSleepSamples(userId: Int, data: HealthSampleContainerModel<SleepSampleModel>) async throws -> Void
     func sendStepSamples(userId: Int, data: HealthSampleContainerModel<StepCountSampleModel>) async throws -> Void
     func sendVO2MaxSamples(userId: Int, data: HealthSampleContainerModel<VO2MaxSampleModel>) async throws -> Void
 }

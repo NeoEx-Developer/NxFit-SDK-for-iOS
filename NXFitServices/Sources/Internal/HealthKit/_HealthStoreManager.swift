@@ -55,7 +55,8 @@ package class _HealthStoreManager: NSObject, HKClient {
             HKQuantityType.quantityType(forIdentifier: .walkingSpeed)!,
             HKObjectType.activitySummaryType(),
             HKObjectType.workoutType(),
-            HKSeriesType.workoutRoute()
+            HKSeriesType.workoutRoute(),
+            HKCategoryType(.sleepAnalysis)
         ]
         
         if #available(iOS 17, watchOS 10, *) {

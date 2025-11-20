@@ -72,7 +72,7 @@ internal class HKHealthSyncTask<T : BaseHealthSampleDto> where T : HealthSampleC
     }
     
     private func getHealthSampleAnchor(for quantityType: HKQuantityTypeIdentifier) async -> HKQueryAnchor? {
-        if let anchor = await self.context.syncDataManager.getHealthSampleAnchor(for: quantityType) {
+        if let anchor = await self.context.syncDataManager.getHealthSampleAnchor(for: String(describing: quantityType.self)) {
             return anchor
         }
         
@@ -80,7 +80,7 @@ internal class HKHealthSyncTask<T : BaseHealthSampleDto> where T : HealthSampleC
     }
     
     private func saveHealthSampleAnchor(for quantityType: HKQuantityTypeIdentifier, anchor: HKQueryAnchor) async throws -> Void {
-        await self.context.syncDataManager.setHealthSampleAnchor(for: quantityType, anchor: anchor)
+        await self.context.syncDataManager.setHealthSampleAnchor(for: String(describing: quantityType.self), anchor: anchor)
     }
     
     private func sendHealthSamples(sampleEndpoint: ApiSampleEndpoint, mappedSourcesAndSamples: Dictionary<SyncSource, [T]>) async throws -> Void {

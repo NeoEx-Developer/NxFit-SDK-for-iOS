@@ -1,5 +1,5 @@
 //
-//  HKBloodPressureHealthSyncTask.swift
+//  HKSleepHealthSyncTask.swift
 //  NXFitSync
 //
 //  Created by IRC Developer on 2025-03-04.
@@ -11,27 +11,26 @@ import Logging
 import NXFitCommon
 import NXFitServices
 
-internal class HKBloodPressureHealthSyncTask {
+internal class HKSleepHealthSyncTask {
     private let logger: Logger
     private let segmentSize = 5000
     private let context: HKSyncContext
     
     init(_ syncContext: HKSyncContext) {
-        self.logger = Logging.create(identifier: String(describing: HKBloodPressureHealthSyncTask.self))
+        self.logger = Logging.create(identifier: String(describing: HKSleepHealthSyncTask.self))
         self.context = syncContext
     }
     
     internal func run() async -> Void {
-        self.logger.debug("run<BloodPressureSampleDto>: Syncing health samples; background delivery: \(self.context.isBackgroundDelivery)")
+        self.logger.debug("run<SleepSampleDto>: Syncing health samples; background delivery: \(self.context.isBackgroundDelivery)")
         
         do {
             let authResult = try await self.context.healthStore.statusForAuthorizationRequest(toShare: [], read: [
-                .quantityType(forIdentifier: .bloodPressureSystolic)!,
-                .quantityType(forIdentifier: .bloodPressureDiastolic)!
+                .categoryType(forIdentifier: .sleepAnalysis)!,
             ])
             
             guard authResult == .unnecessary else {
-                self.logger.debug("run<BloodPressureSampleDto>: Aborting sync task, permission prompt is required for given type bloodPressureSystolic & bloodPressureDiastolic")
+                self.logger.debug("run<SleepSampleDto>: Aborting sync task, permission prompt is required for given type sleepAnalysis")
                 
                 return
             }
@@ -40,11 +39,11 @@ internal class HKBloodPressureHealthSyncTask {
             var processing = true
             
             while(processing) {
-                let mappedSourcesAndSamples: Dictionary<SyncSource, [BloodPressureSampleDto]>?
+                let mappedSourcesAndSamples: Dictionary<SyncSource, [SleepSampleDto]>?
                 
-                (anchor, mappedSourcesAndSamples) = try await _HKQueries.getHealthBloodPressureSamples(self.logger, self.context.healthStore, anchor: anchor)
+                (anchor, mappedSourcesAndSamples) = try await _HKQueries.getSleepSamples(self.logger, self.context.healthStore, anchor: anchor)
                 
-                self.logger.debug("run<BloodPressureSampleDto>: \(mappedSourcesAndSamples?.count ?? 0) sources with samples found; background delivery: \(self.context.isBackgroundDelivery)")
+                self.logger.debug("run<SleepSampleDto>: \(mappedSourcesAndSamples?.count ?? 0) sources with samples found; background delivery: \(self.context.isBackgroundDelivery)")
                 
                 if let mappedSourcesAndSamples = mappedSourcesAndSamples, mappedSourcesAndSamples.count > 0 {
                     try await self.sendHealthSamples(mappedSourcesAndSamples: mappedSourcesAndSamples)
@@ -72,8 +71,7 @@ internal class HKBloodPressureHealthSyncTask {
     }
     
     private func getHealthSampleAnchor() async -> HKQueryAnchor? {
-
-        if let anchor = await self.context.syncDataManager.getHealthSampleAnchor(for: String(describing: HKCorrelationTypeIdentifier.bloodPressure.self)) {
+        if let anchor = await self.context.syncDataManager.getHealthSampleAnchor(for: String(describing: HKCategoryTypeIdentifier.sleepAnalysis.self)) {
             return anchor
         }
         
@@ -81,14 +79,14 @@ internal class HKBloodPressureHealthSyncTask {
     }
     
     private func saveHealthSampleAnchor(anchor: HKQueryAnchor) async throws -> Void {
-        await self.context.syncDataManager.setHealthSampleAnchor(for: String(describing: HKCorrelationTypeIdentifier.bloodPressure.self), anchor: anchor)
+        await self.context.syncDataManager.setHealthSampleAnchor(for: String(describing: HKCategoryTypeIdentifier.sleepAnalysis.self), anchor: anchor)
     }
     
-    private func sendHealthSamples(mappedSourcesAndSamples: Dictionary<SyncSource, [BloodPressureSampleDto]>) async throws -> Void {
+    private func sendHealthSamples(mappedSourcesAndSamples: Dictionary<SyncSource, [SleepSampleDto]>) async throws -> Void {
         for (source, samples) in mappedSourcesAndSamples {
             let count = samples.count
 
-            self.logger.debug("sendHealthSamples<BloodPressureSampleDto>: \(count) samples found; background delivery: \(self.context.isBackgroundDelivery)")
+            self.logger.debug("sendHealthSamples<SleepSampleDto>: \(count) samples found; background delivery: \(self.context.isBackgroundDelivery)")
             
             if count > self.segmentSize {
                 let segments = Int(ceil((Double(count) / Double(self.segmentSize))))
@@ -103,11 +101,11 @@ internal class HKBloodPressureHealthSyncTask {
 
                     let slice = samples[start..<end]
 
-                    try await self.context.sampleApi.sendData(userId: self.context.userId, sampleEndpoint: .bloodPressure, data: HealthSampleContainerDto(source: source, samples: Array(slice)))
+                    try await self.context.sampleApi.sendData(userId: self.context.userId, sampleEndpoint: .sleep, data: HealthSampleContainerDto(source: source, samples: Array(slice)))
                 }
             }
             else {
-                try await self.context.sampleApi.sendData(userId: self.context.userId, sampleEndpoint: .bloodPressure, data: HealthSampleContainerDto(source: source, samples: samples))
+                try await self.context.sampleApi.sendData(userId: self.context.userId, sampleEndpoint: .sleep, data: HealthSampleContainerDto(source: source, samples: samples))
             }
         }
     }

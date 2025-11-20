@@ -284,6 +284,7 @@ internal class HealthKitManager {
         await HKHealthSyncTask<OxygenSaturationSampleDto>(context, quantityType: .oxygenSaturation).run()
         await HKHealthSyncTask<RespiratoryRateSampleDto>(context, quantityType: .respiratoryRate).run()
         await HKHealthSyncTask<HeartRateSampleDto>(context, quantityType: .restingHeartRate).run()
+        await HKSleepHealthSyncTask(context).run()
         await HKHealthSyncTask<StepCountSampleDto>(context, quantityType: .stepCount).run()
         await HKHealthSyncTask<VO2MaxSampleDto>(context, quantityType: .vo2Max).run()
     }

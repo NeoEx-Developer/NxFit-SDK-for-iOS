@@ -96,8 +96,8 @@ internal class HealthKitDataManager {
         }
     }
     
-    internal func getHealthSampleAnchor(for quantityType: HKQuantityTypeIdentifier) async -> HKQueryAnchor? {
-        guard let cache = await getHealthSampleAnchorCache(for: quantityType), let anchor = cache.anchor else {
+    internal func getHealthSampleAnchor(for sampleType: String) async -> HKQueryAnchor? {
+        guard let cache = await getHealthSampleAnchorCache(for: sampleType), let anchor = cache.anchor else {
             return nil
         }
         
@@ -237,21 +237,21 @@ internal class HealthKitDataManager {
         }
     }
     
-    internal func setHealthSampleAnchor(for quantityType: HKQuantityTypeIdentifier, anchor: HKQueryAnchor) async -> Void {
-        let existingCache = await getHealthSampleAnchorCache(for: quantityType)
+    internal func setHealthSampleAnchor(for sampleType: String, anchor: HKQueryAnchor) async -> Void {
+        let existingCache = await getHealthSampleAnchorCache(for: sampleType)
         
         await self.backgroundCtx?.perform {
             let cache = existingCache ?? _HealthSampleSyncAnchor(context: self.backgroundCtx!)
 
             do {
-                cache.sampleType = quantityType
+                cache.sampleType = sampleType
                 cache.timestamp = Date.now
                 cache.anchor = try NSKeyedArchiver.archivedData(withRootObject: anchor, requiringSecureCoding: true)
 
                 try self.backgroundCtx?.save()
             }
             catch {
-                self.logger.error("setHealthSampleAnchor: Failed to save anchor; HKQuantityTypeIdentifier: \(String(describing: quantityType)); error: \(error)")
+                self.logger.error("setHealthSampleAnchor: Failed to save anchor; Sample type: \(sampleType); error: \(error)")
             }
         }
     }
@@ -348,11 +348,11 @@ internal class HealthKitDataManager {
         }
     }
     
-    private func getHealthSampleAnchorCache(for quantityType: HKQuantityTypeIdentifier) async -> _HealthSampleSyncAnchor? {
+    private func getHealthSampleAnchorCache(for sampleType: String) async -> _HealthSampleSyncAnchor? {
         await self.backgroundCtx?.perform {
             let request = _HealthSampleSyncAnchor.fetchRequest()
             request.fetchLimit = 1
-            request.predicate = NSPredicate(format: "sampleType_ == %@", quantityType.rawValue)
+            request.predicate = NSPredicate(format: "sampleType_ == %@", sampleType)
             request.returnsObjectsAsFaults = false
             
             return try? self.backgroundCtx?.fetch(request).first

@@ -62,6 +62,10 @@ package class UserSampleApiService : BaseApiService, UserSampleClient {
         try await sendData(userId: userId, sampleEndpoint: ApiSampleEndpoint.respiratoryRate, data: data.asDto(convert: RespiratoryRateSampleDto.init))
     }
     
+    public func sendSleepSamples(userId: Int, data: HealthSampleContainerModel<SleepSampleModel>) async throws {
+        try await sendData(userId: userId, sampleEndpoint: ApiSampleEndpoint.sleep, data: data.asDto(convert: SleepSampleDto.init))
+    }
+    
     public func sendStepSamples(userId: Int, data: HealthSampleContainerModel<StepCountSampleModel>) async throws {
         try await sendData(userId: userId, sampleEndpoint: ApiSampleEndpoint.stepCount, data: data.asDto(convert: StepCountSampleDto.init))
     }
